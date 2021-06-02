@@ -1,0 +1,200 @@
+{% extends "estructura.html" %}
+
+{% block title %} Proyecto Atlas {% endblock %}
+
+{% block body %}
+    <!-- Masthead-->
+    <header class="masthead text-white text-center">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto"><h1 class="mb-5">Encuentra la mejor ruta<br>Disfruta del viaje</h1></div>
+                <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+                    <form autocomplete="off" method="POST" action="">
+                        <div class="form-row autocomplete" for="origen">
+                            <div class="col-12 col-md-9 mb-2 mb-md-0"><input class="form-control form-control-lg" type="text" id="origen" name="origen" placeholder="Origen" /></div>
+                        </div>
+                        <br>
+                        <div class="form-row autocomplete" for="destino">
+                            <div class="col-12 col-md-9 mb-2 mb-md-0"><input class="form-control form-control-lg" type="text" id="destino" name="destino" placeholder="Destino" /></div>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <div class="col-12 col-md-3"><button class="btn btn-block btn-lg btn-primary" type="submit" style="width: 150%;">Encontrar ruta</button></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- BOTON NUEVO-->
+    <section class="call-to-action2 text-white text-center">
+
+        <div class="overlay"></div>
+        
+        <div class="container">
+        
+        <div class="row">
+        
+        <div class="col-xl-9 mx-auto"><h2 class="mb-4">Descubre quien está en el aire</h2></div>
+        
+        <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+        
+        <form>
+        
+        <div class="form-row">
+        
+        <a class="btn btn-block btn-lg btn-primary" href="http://localhost:8000/" target="_blank" style="width: 150%;">Ver mapa</a>
+        
+        </div>
+        
+        </form>
+        
+        </div>
+        
+        </div>
+        
+        </div>
+    
+    </section>
+    <!-- Icons Grid-->
+    <section class="features-icons bg-light text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex"><i class="fas fa-tv fa-4x m-auto text-primary"></i></div>
+                        <h3>Adaptabilidad</h3> 
+                        <p class="lead mb-0">Puedes usar nuestro servicio en cualquier dispositivo</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex"><i class="far fa-check-circle fa-5x m-auto text-primary"></i></div>
+                        <h3>Sencillez</h3> 
+                        <p class="lead mb-0">Indicas dónde quieres ir y nosotros te marcamos el camino</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+                        <div class="features-icons-icon d-flex"><i class="fas fa-map-marked-alt fa-5x m-auto text-primary"></i></div>
+                        <h3>Interactividad</h3>
+                        <p class="lead mb-0">Podrás modificar la información visible en el mapa en tiempo real</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Image Showcases-->
+    <section class="showcase bg-light">
+        <div class="container-fluid p-0">
+            <div class="row no-gutters">
+                <div class="col-lg-6 order-lg-2 text-white showcase-img" style="background-image: url('static/assets/img/vor\ 3.png')"></div>
+                <div class="col-lg-6 order-lg-1 my-auto showcase-text">
+                    <h2>Navegación VOR</h2>
+                    <p class="lead mb-0">Haciendo uso de los numerosos puntos VOR a nivel nacional, trazamos la mejor aerovía para llevarte a tu destino.*</p>
+                    <p class="lead mb-0" style="font-size: small;">*Excepto Islas Canarias</p>
+                </div>
+            </div>
+            <div class="row no-gutters">
+                <div class="col-lg-6 text-white showcase-img" style="background-image: url('static/assets/img/phone.jpg')" ></div>
+                <div class="col-lg-6 my-auto showcase-text">
+                    <h2>Trackeo del tráfico aéreo</h2>
+                    <p class="lead mb-0">Comprueba el estado del tráfico aéreo en la península en directo. <br> Con información sobre cada vuelo y ruta.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--Sobre nuestro equipo-->
+    <section class=" pt-5 text-center bg-light">
+        <div class="container-fluid">
+            <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                <div class="features-icons-icon d-flex"><i class="fas fa-users fa-5x m-auto text-primary"></i></div>
+            </div>
+            <h1 class="mb-5">Sobre nuestro equipo</h1>
+            <p class="lead mb-0 my-auto" >Somos un grupo de alumnos de la ETSIAE, en la universidad politécnica de Madrid, sacando adelante una idea de proyecto.
+                <br> Mientras mejoramos nuestas habilidades de pragramación (HTML5, JavaScript, CSS y Python) queremos ofrecer un producto útil y de calidad que nos distinga de lo demás y demuestre nuestras capacidades.
+            </p>
+        </div>
+    </section>
+
+
+
+
+    <!-- Testimonials-->
+    <section class="testimonials text-center bg-light">
+        <div class="container">
+            <h2 class="mb-5">Miembros</h2>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+                        <img class="img-fluid rounded-circle mb-3" src="static/assets/img/usuarioDesconocido.png" alt="..." />
+                        <h5>Lucas Vigara</h5>
+                        <p class="font-weight-light mb-0">Equipo Python</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+                        <img class="img-fluid rounded-circle mb-3" src="static/assets/img/usuarioDesconocido.png" alt="..." />
+                        <h5>Rafel Rincón</h5>
+                        <p class="font-weight-light mb-0">Equipo JavaScript</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+                        <img class="img-fluid rounded-circle mb-3" src="static/assets/img/usuarioDesconocido.png" alt="..." />
+                        <h5>Iñigo Calleja</h5>
+                        <p class="font-weight-light mb-0">Equipo JavaScript</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+                        <img class="img-fluid rounded-circle mb-3" src="static/assets/img/usuarioDesconocido.png" alt="..." />
+                        <h5>Sergio Gonzalez</h5>
+                        <p class="font-weight-light mb-0">Equipo Python</p>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+                        <img class="img-fluid rounded-circle mb-3" src="static/assets/img/usuarioDesconocido.png" alt="..." />
+                        <h5>Rodrigo Garces</h5>
+                        <p class="font-weight-light mb-0">Equipo JavaScript</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Call to Action-->
+    <section class="call-to-action text-white text-center">
+        <div class="overlay"></div>
+        <div class="container">
+        </div>
+    </section>
+
+    <footer class="footer bg-light">
+
+        <div class="container">
+
+            <div class="row">
+
+                <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+
+                    <ul class="list-inline mb-2">
+                        <li class="list-inline-item"><a href="/objetivos">Objetivos del Proyecto</a></li>
+                    </ul>
+                    <p class="text-muted small mb-4 mb-lg-0">© Project Atlas 2021. All Rights Reserved.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+    <!-- PARTE JS -->
+    <script type=text/javascript src="{{
+        url_for('static', filename='js/autocomplete.js') }}"></script>
+{% endblock %}
