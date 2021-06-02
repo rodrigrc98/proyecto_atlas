@@ -1,4 +1,4 @@
-# proyecto_atlas
+# PROYECTO ATLAS
 Para correr la app seguir los siguientes pasos (descrito para Windows).
 
 # Creacion del env en python
