@@ -4,9 +4,9 @@ Para correr la app seguir los siguientes pasos (descrito para Windows).
 # Creacion del env en python
 Se recomienda la creacion de un env de python en la carpeta donde se vaya a guardar el codigo. Para ello
 realizar los siguientes pasos en la terminal:
-1º Escogemos la carpeta -->  $ cd micarpeta
-2º Ahora creamos el env --> $ py -3 -m venv venv
-3º Para activarlo introducimos --> $ venv\Scripts\activate
+1. Escogemos la carpeta -->  $ cd micarpeta
+2. Ahora creamos el env --> $ py -3 -m venv venv
+3. Para activarlo introducimos --> $ venv\Scripts\activate
 
 # Instalacion de los paquetes
 Con el env activado, instalaremos los paquetes con los siguiente comandos:
@@ -20,9 +20,9 @@ Para iniciar el servidor debemos tener activado el env, despues introduciremos e
 
 Una vez hecho esto deberemos poner en funcionamiento el archivo *flight_radar.ipynb*, para ello una vez inciado
 el servidor en Jupyter:
-1º Copiamos el enlace en la barra de navegador web del servidor.
-2º Vamos a la carpeta *app*
-3º Abrimos el archivo y lo ejecutamos con el boton *run*. 
+1. Copiamos el enlace en la barra de navegador web del servidor.
+2. Vamos a la carpeta *app*
+3. Abrimos el archivo y lo ejecutamos con el boton *run*. 
 
 Con esto ya esta activado para su uso en el *localhost:8000*. Para apagar el servidor basta con pulsar *ctrl + c*.
 
