@@ -16,12 +16,12 @@ def Dist_Coord (init_lat, end_lat, init_long, end_long):
     lat_dif = (lat2-lat1)
     lon_dif = (lon2-lon1)
 
-    #formulas
+    #formulas de la distancia entre dos puntos de una superficie esferica
 
     a = sin(lat_dif/2) * sin(lat_dif/2) + cos(lat1) * cos(lat2) *sin(lon_dif/2) * sin(lon_dif/2)
     c = 2 * atan2(sqrt(a), sqrt(1-a))
 
-    d = R * c; # in metres
+    d = R * c; # en metros
 
     return(d)
 
