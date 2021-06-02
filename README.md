@@ -17,6 +17,7 @@ Para iniciar el servidor debemos tener activado el env, despues introduciremos l
 * $ set FLASK_APP=app.py
 * $ set FLASK_ENV=development (esto es por si queremos usar el modo debug)
 * $ flask run
+
 Una vez hecho esto nos aparecera el puerto donde esta la app, y bastara con copiarlo en la barra del navegador
 web que tengamos predeterminado.
 
