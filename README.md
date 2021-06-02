@@ -51,6 +51,6 @@ esto en otra terminal ya que en la otra tendremos el servidor de Jupyter activo)
 *$ flask run*
 
 Una vez hecho esto nos aparecera el puerto donde esta la app, y bastara con copiarlo en la barra del navegador
-web que tengamos predeterminado. Con esto ya se puede utilizar de forma completa. Para apagar el servidor basta con pulsar 
+web que tengamos predeterminado. Con esto ya se puede utilizar la app de forma completa. Para apagar el servidor basta con pulsar 
 *ctrl + c*, al igual que se hacia con el servidor Jupyter.
 
