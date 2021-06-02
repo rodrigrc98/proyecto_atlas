@@ -1,8 +1,8 @@
 # PROYECTO ATLAS
 Para correr la app seguir los siguientes pasos (descrito para Windows).
 
-# Creacion del env en python
-Se recomienda la creacion de un env de python en la carpeta donde se vaya a guardar el codigo. Pegar alli todos los archivos y carpetas **tal y como estan** subidos. Para crear el env, realizar los siguientes pasos en la terminal:
+# Creacion del venv en python
+Se recomienda la creacion de un venv de python en la carpeta donde se vaya a guardar el codigo. Pegar alli todos los archivos y carpetas **tal y como estan** subidos. Para crear el env, realizar los siguientes pasos en la terminal:
 1. Escogemos la carpeta -->  *$ cd micarpeta*
 2. Ahora creamos el env --> *$ py -m venv env*
 3. Para activarlo introducimos --> *$ env\Scripts\activate*
