@@ -1,10 +1,15 @@
+<!-- Creacion de la estructura que van a heredar todas las paginas de la app -->
 <html>
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
+
+        <!-- Para que flask lo reconozca y poder comuniar el frontend con el backend esta redactado en lenguaje Jinja -->
+        <!-- Bloque que se encarga de que cada pestaña se llame diferente -->
         <title>{% block title %} {% endblock %}</title>
+
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/airplaneIcon.ico')}}" />
         <!-- Font Awesome icons (free version)-->
@@ -15,10 +20,14 @@
         <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link  rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css')}}" >
+
+        <!-- Bloque para añadir diferentes extensiones en head si se necesita en alguna pagina particular -->
         {% block head %}
         {% endblock %}
     </head>
     <body>
+
+        <!-- Head de todas las paginas -->
         <nav class="navbar navbar-light bg-light static-top">
             <div class="container">
                 <a class="navbar-brand" id="home" href="/">Proyecto Atlas</a>
@@ -26,10 +35,12 @@
             </div>
         </nav>
 
+        <!-- Funcion para que cuando la entrada de datos sea erronea o se quiera mandar una notificacion de felicitacion aparezca debajo del head -->
+        <!-- Necesaria para que funcione la libreria flash de flask -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              {% if category == 'error' %}
+              {% if category == 'error' %} 
                 <div class="alert alert-danger alter-dismissable fade show" role="alert">
                   {{ message }}
                   <button type="button" class="close" data-dismiss="alert">
@@ -47,15 +58,35 @@
             {% endfor %}
           {% endif %}
         {% endwith %}
-
+        
+        <!-- Bloque para el body de cada pagina -->
         {% block body %}
         
         {% endblock %}
 
-        <!-- Bootstrap core JS-->
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Creacion del footer de la pagina -->
+        <footer class="footer bg-light">
+          <div class="container">
+              <div class="row">
+                  <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+                    
+                    <!-- Footer personalizado -->
+                    {% block footer %}
+                      
+                    {% endblock %}
+                  </div>
+              </div>
+          </div>
+      </footer>
+
+      <!-- Bootstrap core JS-->
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
+      <!-- JavaScript propios de cada pagina -->
+      {% block javascript %}
+      
+      {% endblock %}
         
-  
     </body>
 </html>

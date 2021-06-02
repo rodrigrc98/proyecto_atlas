@@ -1,6 +1,10 @@
+<!-- Herencia de estructura -->
 {% extends "estructura.html" %}
+
+<!-- Title pagina -->
 {% block title %} Buscador {% endblock %}
 
+<!-- Head personalizado para añadir leaflet a la estructura de la pagina principal -->
 {% block head %}
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -72,6 +76,7 @@
     </style>
 {% endblock %}
 
+<!-- Body pagina -->
 {% block body %}
     <div id="mapid"> </div>
 
@@ -178,7 +183,7 @@
     });
 
 
-
+    // LISTADO DE AEROPUERTOS
 
     var aeropuertos = [
     L.marker([40.499246, -3.567437], {icon: airporticon, nombre:"MADRID", coordenadas:[40.499246, -3.567437] }).bindPopup('Aeropuerto de Madrid-Barajas Adolfo Suárez'),
@@ -706,6 +711,7 @@
     <!-- Funcion para pintar la ruta cuando se inicie el mapa -->
     <script>
 
+        // Variables obtenidas mediante flask
         var orig = "{{ orig }}";
         var dest = "{{ dest }}" ;
 
@@ -713,11 +719,12 @@
         let dist = JSON.parse('{{ dist | tojson }}');
         var numVOR = way.length;
 
+        // Informacion de los apartados de distancia y cantidad de vors
         document.getElementById("numeroVOR").value= numVOR;
         document.getElementById("distancia").value= Math.round(dist/1000);
 
         let vectorflask1 = way.unshift(orig);
-        let vectorflask = way.push(dest);
+        let vectorflask2 = way.push(dest);
         var sizevec = way.length ;
 
         var coordorig = [];
@@ -751,6 +758,6 @@
             var rutaelegida  = L.polygon([coordendasvor[i], coordendasvor[i-1]]).addTo(map).addTo(routes);
         } 
         
-
     </script>
 {% endblock %}
+

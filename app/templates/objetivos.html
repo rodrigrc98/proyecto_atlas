@@ -1,7 +1,10 @@
-{% extends "estructura.html" %}
+<!-- Herencia de estructura -->
+{% extends "estructura.html" %} 
 
+<!-- Title pagina -->
 {% block title %} Objetivos {% endblock %}
-  
+ 
+<!-- Body pagina -->
 {% block body %}
         <!--Sobre nuestro equipo-->
         <section class=" pt-5 text-center bg-light">
@@ -48,24 +51,11 @@
             </div>
         </section>
 
-        <footer class="footer bg-light">
+{% endblock %}
 
-            <div class="container">
-    
-                <div class="row">
-    
-                    <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
-    
-                        <ul class="list-inline mb-2">
-                            <li class="list-inline-item"><a href="/">Home</a></li>
-                        </ul>
-                        <p class="text-muted small mb-4 mb-lg-0">© Project Atlas 2021. All Rights Reserved.</p>
-    
-                    </div>
-    
-                </div>
-    
-            </div>
-    
-        </footer>
+{% block footer %}
+    <ul class="list-inline mb-2">
+        <li class="list-inline-item"><a href="/">Home</a></li>
+    </ul>
+    <p class="text-muted small mb-4 mb-lg-0">© Project Atlas 2021. All Rights Reserved.</p>
 {% endblock %}
