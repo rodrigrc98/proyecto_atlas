@@ -4,7 +4,7 @@ Para correr la app seguir los siguientes pasos (descrito para Windows).
 # Creacion del env en python
 Se recomienda la creacion de un env de python en la carpeta donde se vaya a guardar el codigo. Para ello
 realizar los siguientes pasos en la terminal:
-1º Escogemos la carpeta.
+* [01-HTML] 1º Escogemos la carpeta.
 $ cd micarpeta
 2Ahora creamos el env.
 $ py -3 -m venv venv
