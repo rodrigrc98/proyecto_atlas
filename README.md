@@ -10,12 +10,12 @@ realizar los siguientes pasos en la terminal:
 
 # Instalacion de los paquetes
 Con el env activado, instalaremos los paquetes con los siguiente comandos:
-$ pip install Flask
+* $ pip install Flask
 
 # Iniciar el servidor en FLASK
 Para iniciar el servidor debemos tener activado el env. Despues introduciremos los siguientes comandos:
-$ set FLASK_APP=app.py
-$ set FLASK_ENV=development (esto es por si queremos usar el modo debug)
-$ flask run
+* $ set FLASK_APP=app.py
+* $ set FLASK_ENV=development (esto es por si queremos usar el modo debug)
+* $ flask run
 
 
