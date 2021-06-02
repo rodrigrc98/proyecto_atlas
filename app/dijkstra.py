@@ -1,5 +1,5 @@
 from collections import defaultdict, deque
-from .importar_excel import init_long_list, init_latit_list, end_long_list, end_latit_list, distance_list, route_name, vor_name_end, vor_name_ini
+from .importar_excel import distance_list, route_name, vor_name_end, vor_name_ini
 
 #clase Graph donde almacena la red de nodos, caminos y distancias
 
