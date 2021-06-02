@@ -96,9 +96,3 @@ for n in init_latit_list:
     distance_list.append(round(d_between_vor, 2))
     
     i +=1
-
-
-
-# print(len(vor_name_ini))
-# print(len(init_long_list))
-# print(len(init_latit_list))
