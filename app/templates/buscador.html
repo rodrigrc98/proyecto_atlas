@@ -1,0 +1,756 @@
+{% extends "estructura.html" %}
+{% block title %} Buscador {% endblock %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDEX</title>
+
+    <!-- LEAFLET -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+    <!-- ESRI -->
+    <script src="https://unpkg.com/esri-leaflet@3.0.1/dist/esri-leaflet.js"
+    integrity="sha512-JmpptMCcCg+Rd6x0Dbg6w+mmyzs1M7chHCd9W8HPovnImG2nLAQWn3yltwxXRM7WjKKFFHOAKjjF2SC4CgiFBg=="
+    crossorigin=""></script>
+
+    <style>
+
+    body { margin:0; padding:0 }
+    #mapid {
+    height: 600px;
+    margin: 0px 0px 20px 0px;
+    }
+
+    .buscador{
+    margin: 20px;
+    width:50%;
+    float: left;
+
+    }
+
+    .right{
+      margin: 20px;
+      width: 40%;
+      float: left;
+    }
+
+    input[type=text], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    }
+
+    input[type=submit] {
+    width: 100%;
+    background-color: #0ab2ff;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+    background-color: #0ab2ff;
+    }
+    
+    .leaflet-control {background-color: #202020;}
+
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div id="mapid"> </div>
+
+    <!-- BOTONES Y BUSCADOR -->
+    <form action="" method="POST" >
+    <div class="buscador">
+    <form>
+
+        <label for="origen">Origen:</label>    
+        <select id="origen" name="origen">
+            <option value="MADRID">Madrid</option>
+            <option value="BARCELONA">Barcelona</option>
+            <option value="BILBAO">Bilbao</option>
+            <option value="SEVILLA">Sevilla</option>
+            <option value="SANTANDER">Santander</option>
+            <option value="ASTURIAS">Asturias</option>
+            <option value="SANTIAGO">Santiago</option>
+            <option value="A CORUNA">A Coruña</option>
+            <option value="VIGO">Vigo</option>
+            <option value="VALLADOLID">Valladolid</option>
+            <option value="SALAMANCA">Salamanca</option>
+            <option value="ZARAGOZA">Zaragoza</option>
+            <option value="GIRONA">Girona</option>
+            <option value="VALENCIA">Valencia</option>
+            <option value="ALBACETE">Albacete</option>
+            <option value="ALICANTE">Alicante</option>
+            <option value="MURCIA">Murcia</option>
+            <option value="ALMERIA">Almeria</option>
+            <option value="GRANADA">Granada</option>
+            <option value="MALAGA">Malaga</option>
+            <option value="JEREZ">Jerez</option>
+            <option value="MALLORCA">Mallorca</option>
+            <option value="IBIZA">Ibiza</option>
+            <option value="MENORCA">Menorca</option>
+        </select>
+
+        <label for="destino">Destino:</label>
+        <select id="destino" name="destino">
+            <option value="MADRID">Madrid</option>
+            <option value="BARCELONA">Barcelona</option>
+            <option value="BILBAO">Bilbao</option>
+            <option value="SEVILLA">Sevilla</option>
+            <option value="SANTANDER">Santander</option>
+            <option value="ASTURIAS">Asturias</option>
+            <option value="SANTIAGO">Santiago</option>
+            <option value="A CORUNA">A Coruña</option>
+            <option value="VIGO">Vigo</option>
+            <option value="VALLADOLID">Valladolid</option>
+            <option value="SALAMANCA">Salamanca</option>
+            <option value="ZARAGOZA">Zaragoza</option>
+            <option value="GIRONA">Girona</option>
+            <option value="VALENCIA">Valencia</option>
+            <option value="ALBACETE">Albacete</option>
+            <option value="ALICANTE">Alicante</option>
+            <option value="MURCIA">Murcia</option>
+            <option value="ALMERIA">Almeria</option>
+            <option value="GRANADA">Granada</option>
+            <option value="MALAGA">Malaga</option>
+            <option value="JEREZ">Jerez</option>
+            <option value="MALLORCA">Mallorca</option>
+            <option value="IBIZA">Ibiza</option>
+            <option value="MENORCA">Menorca</option>
+        </select>
+    
+    </form>
+    <input type="submit" value="BUSCAR VUELOS">
+    </form>
+    <input type="button" class= "btn btn-block btn-danger" onclick=routes.clearLayers() value="BORRAR RUTAS">
+    </div>
+    <div class="buscador right">
+    <label for="distancia">Distancia (Km):</label>
+    <input type="text" id="distancia" >
+    <br>
+    <label for="numeroVOR">Número de VOR usados:</label>
+    <input type="text" id="numeroVOR" >
+
+
+    </div>
+
+
+    <script>
+
+    // PLANTILLA DEL MAPA
+
+    var gray = L.esri.basemapLayer('DarkGray');
+
+
+    // ICONO PARA MAPA DE AEROPUERTOS
+    var airporticon = L.icon({
+        iconUrl: 'static/assets/control-tower.png',
+
+        iconSize:     [25, 25], // size of the icon
+        iconAnchor:   [12.5, 25], // point of the icon which will correspond to marker's location
+        popupAnchor:  [0, -30] // point from which the popup should open relative to the iconAnchor
+    });
+
+    // ICONO PARA MAPA DE PUNTOS VOR
+    var voricon = L.icon({
+        iconUrl: 'static/assets/triangulo.png',
+    
+        iconSize:     [7, 7], // size of the icon
+        iconAnchor:   [3.5, 3.5], // point of the icon which will correspond to marker's location
+        popupAnchor:  [0, -30] // point from which the popup should open relative to the iconAnchor
+    });
+
+
+
+
+    var aeropuertos = [
+    L.marker([40.499246, -3.567437], {icon: airporticon, nombre:"MADRID", coordenadas:[40.499246, -3.567437] }).bindPopup('Aeropuerto de Madrid-Barajas Adolfo Suárez'),
+    L.marker([41.302121, 2.085580],  {icon: airporticon, nombre:"BARCELONA", coordenadas:[41.302121, 2.085580]}).bindPopup('Aeropuerto Josep Tarradellas Barcelona-El Prat'),
+    L.marker([43.302818, -2.907962], {icon: airporticon, nombre:"BILBAO", coordenadas:[43.302818, -2.907962]}).bindPopup('Aeropuerto de Bilbao'),
+    L.marker([37.419179, -5.888392], {icon: airporticon, nombre:"SEVILLA", coordenadas:[37.419179, -5.888392]}).bindPopup('Aeropuerto de Sevilla'),
+    L.marker([43.425371, -3.816417], {icon: airporticon, nombre:"SANTANDER", coordenadas:[43.425371, -3.816417]}).bindPopup('Aeropuerto de Santander-Seve Ballestero'),
+    L.marker([43.562997, -6.036579], {icon: airporticon, nombre:"ASTURIAS", coordenadas:[43.562997, -6.036579]}).bindPopup('Aeropuerto de Asturias (OVD)'),
+    L.marker([42.898328, -8.417732], {icon: airporticon, nombre:"SANTIAGO", coordenadas:[42.898328, -8.417732]}).bindPopup('Aeropuerto Rosalía de Castro-Santiago de Compostela'),
+    L.marker([43.300783, -8.379770], {icon: airporticon, nombre:"ACORUNA", coordenadas:[43.300783, -8.379770]}).bindPopup('Aeroporto de A Coruña'),
+    L.marker([42.230373, -8.627758], {icon: airporticon, nombre:"VIGO", coordenadas:[42.230373, -8.627758]}).bindPopup('Aeropuerto de Vigo'),
+    L.marker([41.705582, -4.845992], {icon: airporticon, nombre:"VALLADOLID", coordenadas:[41.705582, -4.845992]}).bindPopup('Aeropuerto de Valladolid'),
+    L.marker([40.943715, -5.504752], {icon: airporticon, nombre:"SALAMANCA", coordenadas:[40.943715, -5.504752]}).bindPopup('Aeropuerto de Salamanca'),
+    L.marker([41.659543, -1.043260], {icon: airporticon, nombre:"ZARAGOZA", coordenadas:[41.659543, -1.043260]}).bindPopup('Aeropuerto de Zaragoza'),
+    L.marker([41.902714, 2.761757],  {icon: airporticon, nombre:"GIRONA", coordenadas:[41.902714, 2.761757]}).bindPopup('Aeropuerto de Girona'),
+    L.marker([39.488504, -0.478069], {icon: airporticon, nombre:"VALENCIA", coordenadas:[39.488504, -0.478069]}).bindPopup('Aeropuerto de Valencia'),
+    L.marker([38.945562, -1.877423], {icon: airporticon, nombre:"ALBACETE", coordenadas:[38.945562, -1.877423]}).bindPopup('Aeropuerto de Albacete'),
+    L.marker([38.285138, -0.561343], {icon: airporticon, nombre:"ALICANTE", coordenadas:[38.285138, -0.561343]}).bindPopup('Aeropuerto de Alicante-Elche'),
+    L.marker([37.803265, -1.133187], {icon: airporticon, nombre:"MURCIA", coordenadas:[37.803265, -1.133187]}).bindPopup('Aeropuerto de Murcia'),
+    L.marker([36.843988, -2.372428], {icon: airporticon, nombre:"ALMERIA", coordenadas:[36.843988, -2.372428]}).bindPopup('Aeropuerto de Almeria'),
+    L.marker([37.187309, -3.779395], {icon: airporticon, nombre:"GRANADA", coordenadas:[37.187309, -3.779395]}).bindPopup('Aeropuerto Federico García Lorca Granada-Jaén'),
+    L.marker([36.676691, -4.495726], {icon: airporticon, nombre:"MALAGA", coordenadas:[36.676691, -4.495726]}).bindPopup('Aeropuerto de Málaga - Costa del Sol'),
+    L.marker([36.744743, -6.061393], {icon: airporticon, nombre:"JEREZ", coordenadas:[36.744743, -6.061393]}).bindPopup('Aeropuerto de Jerez'),
+    L.marker([39.551368, 2.735650],  {icon: airporticon, nombre:"MALLORCA", coordenadas:[39.551368, 2.735650]}).bindPopup('Aeropuerto de Palma de Mallorca'),
+    L.marker([38.874542, 1.370365],  {icon: airporticon, nombre:"IBIZA", coordenadas:[38.874542, 1.370365]}).bindPopup('Aeropuerto de Ibiza'),
+    L.marker([39.862625, 4.220085],  {icon: airporticon, nombre:"MENORCA", coordenadas:[39.862625, 4.220085]}).bindPopup('Aeropuerto de Menorca')
+    ]
+
+    var airports = L.layerGroup(aeropuertos);
+
+    
+    // LISTADO DE PUNTOS VOR
+
+    var points =[
+    L.marker([44.3932,-5.5012], {icon: voricon, nombre:"LOTEE", coordenadas:[44.3932,-5.5012], latitud:44.3932, longitud:-5.5012}).bindPopup("VOR:LOTEE"),
+    L.marker([43.2956,-7.3547], {icon: voricon, nombre:"MEGAT", coordenadas:[43.2956,-7.3547], latitud:43.2956, longitud:-7.3547}).bindPopup("VOR:MEGAT"),
+    L.marker([42.5536,-8.2531], {icon: voricon, nombre:"SANTIAGO DVOR/DME (STG)", coordenadas:[42.5536,-8.2531], latitud:42.5536, longitud:-8.2531}).bindPopup("VOR:SANTIAGO DVOR/DME (STG)"),
+    L.marker([42.3057,-8.2931], {icon: voricon, nombre:"ASDEB", coordenadas:[42.3057,-8.2931], latitud:42.3057, longitud:-8.2931}).bindPopup("VOR:ASDEB"),
+    L.marker([41.0911,3.4525], {icon: voricon, nombre:"VERSO", coordenadas:[41.0911,3.4525], latitud:41.0911, longitud:3.4525}).bindPopup("VOR:VERSO"),
+    L.marker([40.2623,3.2333], {icon: voricon, nombre:"LUNIK", coordenadas:[40.2623,3.2333], latitud:40.2623, longitud:3.2333}).bindPopup("VOR:LUNIK"),
+    L.marker([39.554,3.0654], {icon: voricon, nombre:"POLLENSA DVOR/DME (POS)", coordenadas:[39.554,3.0654], latitud:39.554, longitud:3.0654}).bindPopup("VOR:POLLENSA DVOR/DME (POS)"),
+    L.marker([39.3124,2.4918], {icon: voricon, nombre:"LULAK", coordenadas:[39.3124,2.4918], latitud:39.3124, longitud:2.4918}).bindPopup("VOR:LULAK"),
+    L.marker([39.2607,2.4529], {icon: voricon, nombre:"MALLORCA DVOR/DME (MJV)", coordenadas:[39.2607,2.4529], latitud:39.2607, longitud:2.4529}).bindPopup("VOR:MALLORCA DVOR/DME (MJV)"),
+    L.marker([39.1446,2.3638], {icon: voricon, nombre:"TUKRO", coordenadas:[39.1446,2.3638], latitud:39.1446, longitud:2.3638}).bindPopup("VOR:TUKRO"),
+    L.marker([38.4503,2.1341], {icon: voricon, nombre:"MEBUT", coordenadas:[38.4503,2.1341], latitud:38.4503, longitud:2.1341}).bindPopup("VOR:MEBUT"),
+    L.marker([38.3949,2.0941], {icon: voricon, nombre:"NINES", coordenadas:[38.3949,2.0941], latitud:38.3949, longitud:2.0941}).bindPopup("VOR:NINES"),
+    L.marker([38.2032,1.5501], {icon: voricon, nombre:"SURIB", coordenadas:[38.2032,1.5501], latitud:38.2032, longitud:1.5501}).bindPopup("VOR:SURIB"),
+    L.marker([38.0856,1.4617], {icon: voricon, nombre:"ELKEM", coordenadas:[38.0856,1.4617], latitud:38.0856, longitud:1.4617}).bindPopup("VOR:ELKEM"),
+    L.marker([37.4512,1.2834], {icon: voricon, nombre:"PIDUD", coordenadas:[37.4512,1.2834], latitud:37.4512, longitud:1.2834}).bindPopup("VOR:PIDUD"),
+    L.marker([40.3633,3.0845], {icon: voricon, nombre:"SISMO", coordenadas:[40.3633,3.0845], latitud:40.3633, longitud:3.0845}).bindPopup("VOR:SISMO"),
+    L.marker([42.2849,2.5859], {icon: voricon, nombre:"KANIG", coordenadas:[42.2849,2.5859], latitud:42.2849, longitud:2.5859}).bindPopup("VOR:KANIG"),
+    L.marker([41.5652,3.1233], {icon: voricon, nombre:"BAGUR DVOR/DME (BGR)", coordenadas:[41.5652,3.1233], latitud:41.5652, longitud:3.1233}).bindPopup("VOR:BAGUR DVOR/DME (BGR)"),
+    L.marker([41.4047,3.1146], {icon: voricon, nombre:"FEVIK", coordenadas:[41.4047,3.1146], latitud:41.4047, longitud:3.1146}).bindPopup("VOR:FEVIK"),
+    L.marker([41.294,3.1114], {icon: voricon, nombre:"SALON", coordenadas:[41.294,3.1114], latitud:41.294, longitud:3.1114}).bindPopup("VOR:SALON"),
+    L.marker([41.1237,3.1026], {icon: voricon, nombre:"SADEM", coordenadas:[41.1237,3.1026], latitud:41.1237, longitud:3.1026}).bindPopup("VOR:SADEM"),
+    L.marker([40.515,3.0927], {icon: voricon, nombre:"DUNES", coordenadas:[40.515,3.0927], latitud:40.515, longitud:3.0927}).bindPopup("VOR:DUNES"),
+    L.marker([40.3,3.0827], {icon: voricon, nombre:"KENAS", coordenadas:[40.3,3.0827], latitud:40.3, longitud:3.0827}).bindPopup("VOR:KENAS"),
+    L.marker([39.0704,3.0752], {icon: voricon, nombre:"TALEN", coordenadas:[39.0704,3.0752], latitud:39.0704, longitud:3.0752}).bindPopup("VOR:TALEN"),
+    L.marker([38.3549,3.083], {icon: voricon, nombre:"XESPA", coordenadas:[38.3549,3.083], latitud:38.3549, longitud:3.083}).bindPopup("VOR:XESPA"),
+    L.marker([38.1737,3.0852], {icon: voricon, nombre:"GENIO", coordenadas:[38.1737,3.0852], latitud:38.1737, longitud:3.0852}).bindPopup("VOR:GENIO"),
+    L.marker([42.463,0.595], {icon: voricon, nombre:"GIROM", coordenadas:[42.463,0.595], latitud:42.463, longitud:0.595}).bindPopup("VOR:GIROM"),
+    L.marker([42.2607,1.0204], {icon: voricon, nombre:"MOPAS", coordenadas:[42.2607,1.0204], latitud:42.2607, longitud:1.0204}).bindPopup("VOR:MOPAS"),
+    L.marker([42.0837,1.0357], {icon: voricon, nombre:"USKAR", coordenadas:[42.0837,1.0357], latitud:42.0837, longitud:1.0357}).bindPopup("VOR:USKAR"),
+    L.marker([41.4152,1.0649], {icon: voricon, nombre:"REBUL", coordenadas:[41.4152,1.0649], latitud:41.4152, longitud:1.0649}).bindPopup("VOR:REBUL"),
+    L.marker([41.3238,1.0747], {icon: voricon, nombre:"ARBEK", coordenadas:[41.3238,1.0747], latitud:41.3238, longitud:1.0747}).bindPopup("VOR:ARBEK"),
+    L.marker([41.1952,1.0908], {icon: voricon, nombre:"KARES", coordenadas:[41.1952,1.0908], latitud:41.1952, longitud:1.0908}).bindPopup("VOR:KARES"),
+    L.marker([41.1146,1.0959], {icon: voricon, nombre:"XIKEN", coordenadas:[41.1146,1.0959], latitud:41.1146, longitud:1.0959}).bindPopup("VOR:XIKEN"),
+    L.marker([41.0859,1.1016], {icon: voricon, nombre:"REUS VOR/DME (RES)", coordenadas:[41.0859,1.1016], latitud:41.0859, longitud:1.1016}).bindPopup("VOR:REUS VOR/DME (RES)"),
+    L.marker([40.3716,1.2657], {icon: voricon, nombre:"PAPOS", coordenadas:[40.3716,1.2657], latitud:40.3716, longitud:1.2657}).bindPopup("VOR:PAPOS"),
+    L.marker([40.0028,1.4556], {icon: voricon, nombre:"DRAGO", coordenadas:[40.0028,1.4556], latitud:40.0028, longitud:1.4556}).bindPopup("VOR:DRAGO"),
+    L.marker([39.3258,2.2345], {icon: voricon, nombre:"ANDRAITX NDB (ADX)", coordenadas:[39.3258,2.2345], latitud:39.3258, longitud:2.2345}).bindPopup("VOR:ANDRAITX NDB (ADX)"),
+    L.marker([38.1606,-0.3412], {icon: voricon, nombre:"ALTET VOR/DME (ALT)", coordenadas:[38.1606,-0.3412], latitud:38.1606, longitud:-0.3412}).bindPopup("VOR:ALTET VOR/DME (ALT)"),
+    L.marker([38.0424,-0.1351], {icon: voricon, nombre:"MAGAL", coordenadas:[38.0424,-0.1351], latitud:38.0424, longitud:-0.1351}).bindPopup("VOR:MAGAL"),
+    L.marker([38.0001,-0.0616], {icon: voricon, nombre:"LUKIL", coordenadas:[38.0001,-0.0616], latitud:38.0001, longitud:-0.0616}).bindPopup("VOR:LUKIL"),
+    L.marker([37.5658,-0.0101], {icon: voricon, nombre:"RAFOL", coordenadas:[37.5658,-0.0101], latitud:37.5658, longitud:-0.0101}).bindPopup("VOR:RAFOL"),
+    L.marker([37.2816,0.4746],  {icon: voricon, nombre:"XENVO", coordenadas:[37.2816,0.4746], latitud:37.2816, longitud:0.4746}).bindPopup("VOR:XENVO"),
+    L.marker([40.2219,-2.3241], {icon: voricon, nombre:"CASTEJÓN DVOR/DME (CJN)", coordenadas:[40.2219,-2.3241], latitud:40.2219, longitud:-2.3241}).bindPopup("VOR:CASTEJÓN DVOR/DME (CJN)"),
+    L.marker([40.1238,-2.093],  {icon: voricon, nombre:"BENED", coordenadas:[40.1238,-2.093], latitud:40.1238, longitud:-2.093}).bindPopup("VOR:BENED"),
+    L.marker([40.0851,-2.0037], {icon: voricon, nombre:"PRADO", coordenadas:[40.0851,-2.0037], latitud:40.0851, longitud:-2.0037}).bindPopup("VOR:PRADO"),
+    L.marker([39.5402,-1.2555], {icon: voricon, nombre:"CENTA", coordenadas:[39.5402,-1.2555], latitud:39.5402, longitud:-1.2555}).bindPopup("VOR:CENTA"),
+    L.marker([39.4819,-1.1242], {icon: voricon, nombre:"CATON", coordenadas:[39.4819,-1.1242], latitud:39.4819, longitud:-1.1242}).bindPopup("VOR:CATON"),
+    L.marker([39.4515,-1.054],  {icon: voricon, nombre:"WALLY", coordenadas:[39.4515,-1.054], latitud:39.4515, longitud:-1.054}).bindPopup("VOR:WALLY"),
+    L.marker([39.4226,-0.5911], {icon: voricon, nombre:"CALLES DVOR/DME (CLS)", coordenadas:[39.4226,-0.5911], latitud:39.4226, longitud:-0.5911}).bindPopup("VOR:CALLES DVOR/DME (CLS)"),
+    L.marker([39.2908,-0.29],   {icon: voricon, nombre:"VALENCIA DVOR/DME (VLC)", coordenadas:[39.2908,-0.29], latitud:39.2908, longitud:-0.29}).bindPopup("VOR:VALENCIA DVOR/DME (VLC)"),
+    L.marker([39.3219,0.1755], {icon: voricon, nombre:"ARGOR", coordenadas:[39.3219,0.1755], latitud:39.3219, longitud:0.1755}).bindPopup("VOR:ARGOR"),
+    L.marker([39.3332,0.3715], {icon: voricon, nombre:"IXUPA", coordenadas:[39.3332,0.3715], latitud:39.3332, longitud:0.3715}).bindPopup("VOR:IXUPA"),
+    L.marker([39.3611,1.2249], {icon: voricon, nombre:"EPAMA", coordenadas:[39.3611,1.2249], latitud:39.3611, longitud:1.2249}).bindPopup("VOR:EPAMA"),
+    L.marker([39.3928,2.2817], {icon: voricon, nombre:"AKAMU", coordenadas:[39.3928,2.2817], latitud:39.3928, longitud:2.2817}).bindPopup("VOR:AKAMU"),
+    L.marker([39.3951,2.3645], {icon: voricon, nombre:"OLUTO", coordenadas:[39.3951,2.3645], latitud:39.3951, longitud:2.3645}).bindPopup("VOR:OLUTO"),
+    L.marker([39.4151,3.2603], {icon: voricon, nombre:"CAPDEPERA DVOR/DME (CDP)", coordenadas:[39.4151,3.2603], latitud:39.4151, longitud:3.2603}).bindPopup("VOR:CAPDEPERA DVOR/DME (CDP)"),
+    L.marker([39.5149,4.1258], {icon: voricon, nombre:"MENORCA DVOR/DME (MHN)", coordenadas:[39.5149,4.1258], latitud:39.5149, longitud:4.1258}).bindPopup("VOR:MENORCA DVOR/DME (MHN)"),
+    L.marker([42.2203,0.283],   {icon: voricon, nombre:"TURUV", coordenadas:[42.2203,0.283], latitud:42.2203, longitud:0.283}).bindPopup("VOR:TURUV"),
+    L.marker([41.5845,0.2235],  {icon: voricon, nombre:"GRAUS", coordenadas:[41.5845,0.2235], latitud:41.5845, longitud:0.2235}).bindPopup("VOR:GRAUS"),
+    L.marker([41.2048,0.1307],  {icon: voricon, nombre:"SEROX", coordenadas:[41.2048,0.1307], latitud:41.2048, longitud:0.1307}).bindPopup("VOR:SEROX"),
+    L.marker([41.1606,0.1158],  {icon: voricon, nombre:"CASPE", coordenadas:[41.1606,0.1158], latitud:41.1606, longitud:0.1158}).bindPopup("VOR:CASPE"),
+    L.marker([41.0747,0.0956],  {icon: voricon, nombre:"MAELLA DVOR/DME (MLA)", coordenadas:[41.0747,0.0956], latitud:41.0747, longitud:0.0956}).bindPopup("VOR:MAELLA DVOR/DME (MLA)"),
+    L.marker([40.522,0.0342],   {icon: voricon, nombre:"CRETA", coordenadas:[40.522,0.0342], latitud:40.522, longitud:0.0342}).bindPopup("VOR:CRETA"),
+    L.marker([40.3329,-0.035],  {icon: voricon, nombre:"RIMES", coordenadas:[40.3329,-0.035], latitud:40.3329, longitud:-0.035}).bindPopup("VOR:RIMES"),
+    L.marker([40.1522,-0.11],   {icon: voricon, nombre:"SAURA", coordenadas:[40.1522,-0.11], latitud:40.1522, longitud:-0.11}).bindPopup("VOR:SAURA"),
+    L.marker([40.0,-0.1701],    {icon: voricon, nombre:"TATOS", coordenadas:[40.0,-0.1701], latitud:40.0, longitud:-0.1701}).bindPopup("VOR:TATOS"),
+    L.marker([39.5326,-0.1935], {icon: voricon, nombre:"PLANA", coordenadas:[39.5326,-0.1935], latitud:39.5326, longitud:-0.1935}).bindPopup("VOR:PLANA"),
+    L.marker([38.0,-0.1304],    {icon: voricon, nombre:"LIMTU", coordenadas:[38.0,-0.1304], latitud:38.0, longitud:-0.1304}).bindPopup("VOR:LIMTU"),
+    L.marker([37.062,-0.0349],  {icon: voricon, nombre:"RINDI", coordenadas:[37.062,-0.0349], latitud:37.062, longitud:-0.0349}).bindPopup("VOR:RINDI"),
+    L.marker([41.2859,-6.1648], {icon: voricon, nombre:"ADORO", coordenadas:[41.2859,-6.1648], latitud:41.2859, longitud:-6.1648}).bindPopup("VOR:ADORO"),
+    L.marker([41.3148,-5.3823], {icon: voricon, nombre:"ZAMORA DVOR/DME (ZMR)", coordenadas:[41.3148,-5.3823], latitud:41.3148, longitud:-5.3823}).bindPopup("VOR:ZAMORA DVOR/DME (ZMR)"),
+    L.marker([40.3729,-4.33],   {icon: voricon, nombre:"AVILA", coordenadas:[40.3729,-4.33], latitud:40.3729, longitud:-4.33}).bindPopup("VOR:AVILA"),
+    L.marker([40.2441,-4.1758], {icon: voricon, nombre:"KALMA", coordenadas:[40.2441,-4.1758], latitud:40.2441, longitud:-4.1758}).bindPopup("VOR:KALMA"),
+    L.marker([40.2207,-4.1458], {icon: voricon, nombre:"NAVAS DEL REY DVOR/DME (NVS)", coordenadas:[40.2207,-4.1458], latitud:40.2207, longitud:-4.1458}).bindPopup("VOR:NAVAS DEL REY DVOR/DME (NVS)"),
+    L.marker([38.0117,-7.0605], {icon: voricon, nombre:"ROSAL", coordenadas:[38.0117,-7.0605], latitud:38.0117, longitud:-7.0605}).bindPopup("VOR:ROSAL"),
+    L.marker([37.4007,-6.1754], {icon: voricon, nombre:"SANTA", coordenadas:[37.4007,-6.1754], latitud:37.4007, longitud:-6.1754}).bindPopup("VOR:SANTA"),
+    L.marker([37.2539,-5.4545], {icon: voricon, nombre:"SEVILLA DVOR/DME (SVL)", coordenadas:[37.2539,-5.4545], latitud:37.2539, longitud:-5.4545}).bindPopup("VOR:SEVILLA DVOR/DME (SVL)"),
+    L.marker([37.0319,-4.5623], {icon: voricon, nombre:"MARTÍN DVOR/DME (MAR)", coordenadas:[37.0319,-4.5623], latitud:37.0319, longitud:-4.5623}).bindPopup("VOR:MARTÍN DVOR/DME (MAR)"),
+    L.marker([36.4851,-4.2211], {icon: voricon, nombre:"MÁLAGA DVOR/DME (MGA)", coordenadas:[36.4851,-4.2211], latitud:36.4851, longitud:-4.2211}).bindPopup("VOR:MÁLAGA DVOR/DME (MGA)"),
+    L.marker([36.4917,-3.443],  {icon: voricon, nombre:"NESDA", coordenadas:[36.4917,-3.443], latitud:36.4917, longitud:-3.443}).bindPopup("VOR:NESDA"),
+    L.marker([36.4954,-2.5027], {icon: voricon, nombre:"KUNEN", coordenadas:[36.4954,-2.5027], latitud:36.4954, longitud:-2.5027}).bindPopup("VOR:KUNEN"),
+    L.marker([36.4959,-2.1534], {icon: voricon, nombre:"ALMERÍA VOR/DME (AMR)", coordenadas:[36.4959,-2.1534], latitud:36.4959, longitud:-2.1534}).bindPopup("VOR:ALMERÍA VOR/DME (AMR)"),
+    L.marker([36.4136,-1.5319], {icon: voricon, nombre:"GATAS", coordenadas:[36.4136,-1.5319], latitud:36.4136, longitud:-1.5319}).bindPopup("VOR:GATAS"),
+    L.marker([40.3,3.5931],     {icon: voricon, nombre:"SARGO", coordenadas:[40.3,3.5931], latitud:40.3, longitud:3.5931}).bindPopup("VOR:SARGO"),
+    L.marker([41.0055,3.4825],  {icon: voricon, nombre:"TOSNU", coordenadas:[41.0055,3.4825], latitud:41.0055, longitud:3.4825}).bindPopup("VOR:TOSNU"),
+    L.marker([41.3241,3.2919],  {icon: voricon, nombre:"AGENA", coordenadas:[41.3241,3.2919], latitud:41.3241, longitud:3.2919}).bindPopup("VOR:AGENA"),
+    L.marker([41.4402,3.2128],  {icon: voricon, nombre:"DALIN", coordenadas:[41.4402,3.2128], latitud:41.4402, longitud:3.2128}).bindPopup("VOR:DALIN"),
+    L.marker([40.4231,1.1354],  {icon: voricon, nombre:"EBROX", coordenadas:[40.4231,1.1354], latitud:40.4231, longitud:1.1354}).bindPopup("VOR:EBROX"),
+    L.marker([40.2117,1.1648],  {icon: voricon, nombre:"MARTA", coordenadas:[40.2117,1.1648], latitud:40.2117, longitud:1.1648}).bindPopup("VOR:MARTA"),
+    L.marker([39.2221,1.2439],  {icon: voricon, nombre:"GODOX", coordenadas:[39.2221,1.2439], latitud:39.2221, longitud:1.2439}).bindPopup("VOR:GODOX"),
+    L.marker([39.0659,1.2639],  {icon: voricon, nombre:"OKITI", coordenadas:[39.0659,1.2639], latitud:39.0659, longitud:1.2639}).bindPopup("VOR:OKITI"),
+    L.marker([36.1713,-3.52],   {icon: voricon, nombre:"EPATA", coordenadas:[36.1713,-3.52], latitud:36.1713, longitud:-3.52}).bindPopup("VOR:EPATA"),
+    L.marker([27.4,-12.3543],   {icon: voricon, nombre:"SOLNA", coordenadas:[27.4,-12.3543], latitud:27.4, longitud:-12.3543}).bindPopup("VOR:SOLNA"),
+    L.marker([27.0834,-13.1305],{icon: voricon, nombre:"LA AYOUNE VOR/DME (LAY)", coordenadas:[27.0834,-13.1305], latitud:27.0834, longitud:-13.1305}).bindPopup("VOR:LA AYOUNE VOR/DME (LAY)"),
+    L.marker([25.4341,-14.2131],{icon: voricon, nombre:"ARENA", coordenadas:[25.4341,-14.2131], latitud:25.4341, longitud:-14.2131}).bindPopup("VOR:ARENA"),
+    L.marker([25.0,-14.5628],   {icon: voricon, nombre:"CABEL", coordenadas:[25.0,-14.5628], latitud:25.0, longitud:-14.5628}).bindPopup("VOR:CABEL"),
+    L.marker([23.4441,-15.5511],{icon: voricon, nombre:"DAKHLA VOR/DME (DKH)", coordenadas:[23.4441,-15.5511], latitud:23.4441, longitud:-15.5511}).bindPopup("VOR:DAKHLA VOR/DME (DKH)"),
+    L.marker([38.3029,-5.0559], {icon: voricon, nombre:"HINOJOSA DEL DUQUE VOR/DME (HIJ)", coordenadas:[38.3029,-5.0559], latitud:38.3029, longitud:-5.0559}).bindPopup("VOR:HINOJOSA DEL DUQUE VOR/DME (HIJ)"),
+    L.marker([36.3032,-6.4337], {icon: voricon, nombre:"CLANA", coordenadas:[36.3032,-6.4337], latitud:36.3032, longitud:-6.4337}).bindPopup("VOR:CLANA"),
+    L.marker([35.5,-7.25],      {icon: voricon, nombre:"KORNO", coordenadas:[35.5,-7.25], latitud:35.5, longitud:-7.25}).bindPopup("VOR:KORNO"),
+    L.marker([30.0615,-12.4302],{icon: voricon, nombre:"TERTO", coordenadas:[30.0615,-12.4302], latitud:30.0615, longitud:-12.4302}).bindPopup("VOR:TERTO"),
+    L.marker([41.3928,-1.0151], {icon: voricon, nombre:"ZARAGOZA VOR/DME (ZAR)", coordenadas:[41.3928,-1.0151], latitud:41.3928, longitud:-1.0151}).bindPopup("VOR:ZARAGOZA VOR/DME (ZAR)"),
+    L.marker([41.162,-1.2301],  {icon: voricon, nombre:"EXEMU", coordenadas:[41.162,-1.2301], latitud:41.162, longitud:-1.2301}).bindPopup("VOR:EXEMU"),
+    L.marker([41.1137,-1.2718], {icon: voricon, nombre:"PISUS", coordenadas:[41.1137,-1.2718], latitud:41.1137, longitud:-1.2718}).bindPopup("VOR:PISUS"),
+    L.marker([40.4642,-1.4942], {icon: voricon, nombre:"EDIMU", coordenadas:[40.4642,-1.4942], latitud:40.4642, longitud:-1.4942}).bindPopup("VOR:EDIMU"),
+    L.marker([40.3044,-2.0351], {icon: voricon, nombre:"ADUXO", coordenadas:[40.3044,-2.0351], latitud:40.3044, longitud:-2.0351}).bindPopup("VOR:ADUXO"),
+    L.marker([40.242,-2.093],   {icon: voricon, nombre:"NUSGO", coordenadas:[40.242,-2.093], latitud:40.242, longitud:-2.093}).bindPopup("VOR:NUSGO"),
+    L.marker([39.4017,-2.4744], {icon: voricon, nombre:"OBIBO", coordenadas:[39.4017,-2.4744], latitud:39.4017, longitud:-2.4744}).bindPopup("VOR:OBIBO"),
+    L.marker([37.5121,-4.3108], {icon: voricon, nombre:"ALCOL", coordenadas:[37.5121,-4.3108], latitud:37.5121, longitud:-4.3108}).bindPopup("VOR:ALCOL"),
+    L.marker([39.0,-3.5358],    {icon: voricon, nombre:"LOGRO", coordenadas:[39.0,-3.5358], latitud:39.0, longitud:-3.5358}).bindPopup("VOR:LOGRO"),
+    L.marker([39.3417,-3.3455], {icon: voricon, nombre:"ETANA", coordenadas:[39.3417,-3.3455], latitud:39.3417, longitud:-3.3455}).bindPopup("VOR:ETANA"),
+    L.marker([28.0438,-15.2543],{icon: voricon, nombre:"GRAN CANARIA DVOR/DME (GDV)", coordenadas:[28.0438,-15.2543], latitud:28.0438, longitud:-15.2543}).bindPopup("VOR:GRAN CANARIA DVOR/DME (GDV)"),
+    L.marker([27.4314,-15.4128],{icon: voricon, nombre:"LOMAS", coordenadas:[27.4314,-15.4128], latitud:27.4314, longitud:-15.4128}).bindPopup("VOR:LOMAS"),
+    L.marker([26.5341,-16.1724],{icon: voricon, nombre:"ODEGI", coordenadas:[26.5341,-16.1724], latitud:26.5341, longitud:-16.1724}).bindPopup("VOR:ODEGI"),
+    L.marker([26.1152,-16.4711],{icon: voricon, nombre:"UDATI", coordenadas:[26.1152,-16.4711], latitud:26.1152, longitud:-16.4711}).bindPopup("VOR:UDATI"),
+    L.marker([39.131,-7.1324],  {icon: voricon, nombre:"ELVAR", coordenadas:[39.131,-7.1324], latitud:39.131, longitud:-7.1324}).bindPopup("VOR:ELVAR"),
+    L.marker([39.3128,-6.2605], {icon: voricon, nombre:"CÁCERES DVOR/DME (CCS)", coordenadas:[39.3128,-6.2605], latitud:39.3128, longitud:-6.2605}).bindPopup("VOR:CÁCERES DVOR/DME (CCS)"),
+    L.marker([39.46,-5.1907],   {icon: voricon, nombre:"MELON", coordenadas:[39.46,-5.1907], latitud:39.46, longitud:-5.1907}).bindPopup("VOR:MELON"),
+    L.marker([39.5508,-4.3511], {icon: voricon, nombre:"NATPA", coordenadas:[39.5508,-4.3511], latitud:39.5508, longitud:-4.3511}).bindPopup("VOR:NATPA"),
+    L.marker([39.581,-4.2014],  {icon: voricon, nombre:"TOLEDO DVOR/DME (TLD)", coordenadas:[39.581,-4.2014], latitud:39.581, longitud:-4.2014}).bindPopup("VOR:TOLEDO DVOR/DME (TLD)"),
+    L.marker([40.0639,-3.4328], {icon: voricon, nombre:"GOTOR", coordenadas:[40.0639,-3.4328], latitud:40.0639, longitud:-3.4328}).bindPopup("VOR:GOTOR"),
+    L.marker([40.1328,-3.1307], {icon: voricon, nombre:"AKOKI", coordenadas:[40.1328,-3.1307], latitud:40.1328, longitud:-3.1307}).bindPopup("VOR:AKOKI"),
+    L.marker([40.1544,-3.0254], {icon: voricon, nombre:"PALIO", coordenadas:[40.1544,-3.0254], latitud:40.1544, longitud:-3.0254}).bindPopup("VOR:PALIO"),
+    L.marker([40.2906,-2.093],  {icon: voricon, nombre:"ELROT", coordenadas:[40.2906,-2.093], latitud:40.2906, longitud:-2.093}).bindPopup("VOR:ELROT"),
+    L.marker([40.4425,-1.1548], {icon: voricon, nombre:"DISVU", coordenadas:[40.4425,-1.1548], latitud:40.4425, longitud:-1.1548}).bindPopup("VOR:DISVU"),
+    L.marker([38.0909,-3.3729], {icon: voricon, nombre:"BAILÉN VOR/DME (BLN)", coordenadas:[38.0909,-3.3729], latitud:38.0909, longitud:-3.3729}).bindPopup("VOR:BAILÉN VOR/DME (BLN)"),
+    L.marker([36.0901,-4.5336], {icon: voricon, nombre:"PIMOS", coordenadas:[36.0901,-4.5336], latitud:36.0901, longitud:-4.5336}).bindPopup("VOR:PIMOS"),
+    L.marker([41.44,4.4],       {icon: voricon, nombre:"LUMAS", coordenadas:[41.44,4.4], latitud:41.44, longitud:4.4}).bindPopup("VOR:LUMAS"),
+    L.marker([41.043,4.3018],   {icon: voricon, nombre:"CHELY", coordenadas:[41.043,4.3018], latitud:41.043, longitud:4.3018}).bindPopup("VOR:CHELY"),
+    L.marker([40.5343,4.2741],  {icon: voricon, nombre:"LAPIT", coordenadas:[40.5343,4.2741], latitud:40.5343, longitud:4.2741}).bindPopup("VOR:LAPIT"),
+    L.marker([40.3,4.22],       {icon: voricon, nombre:"MEROS", coordenadas:[40.3,4.22], latitud:40.3, longitud:4.22}).bindPopup("VOR:MEROS"),
+    L.marker([39.3658,4.1005],  {icon: voricon, nombre:"ELTAN", coordenadas:[39.3658,4.1005], latitud:39.3658, longitud:4.1005}).bindPopup("VOR:ELTAN"),
+    L.marker([39.1303,4.0527],  {icon: voricon, nombre:"MAMOM", coordenadas:[39.1303,4.0527], latitud:39.1303, longitud:4.0527}).bindPopup("VOR:MAMOM"),
+    L.marker([31.2517,-16.0158],{icon: voricon, nombre:"BIMBO", coordenadas:[31.2517,-16.0158], latitud:31.2517, longitud:-16.0158}).bindPopup("VOR:BIMBO"),
+    L.marker([30.2602,-15.5101],{icon: voricon, nombre:"GURKA", coordenadas:[30.2602,-15.5101], latitud:30.2602, longitud:-15.5101}).bindPopup("VOR:GURKA"),
+    L.marker([29.5911,-15.4607],{icon: voricon, nombre:"KASAS", coordenadas:[29.5911,-15.4607], latitud:29.5911, longitud:-15.4607}).bindPopup("VOR:KASAS"),
+    L.marker([41.1826,2.0629],  {icon: voricon, nombre:"BARCELONA DVOR/DME (BCN)", coordenadas:[41.1826,2.0629], latitud:41.1826, longitud:2.0629}).bindPopup("VOR:BARCELONA DVOR/DME (BCN)"),
+    L.marker([41.0305,1.4349],  {icon: voricon, nombre:"RODRA", coordenadas:[41.0305,1.4349], latitud:41.0305, longitud:1.4349}).bindPopup("VOR:RODRA"),
+    L.marker([40.5139,1.2707],  {icon: voricon, nombre:"PEXOT", coordenadas:[40.5139,1.2707], latitud:40.5139, longitud:1.2707}).bindPopup("VOR:PEXOT"),
+    L.marker([40.3259,1.0011],  {icon: voricon, nombre:"LOTOS", coordenadas:[40.3259,1.0011], latitud:40.3259, longitud:1.0011}).bindPopup("VOR:LOTOS"),
+    L.marker([40.1529,0.3518],  {icon: voricon, nombre:"TORDU", coordenadas:[40.1529,0.3518], latitud:40.1529, longitud:0.3518}).bindPopup("VOR:TORDU"),
+    L.marker([40.0025,0.141],   {icon: voricon, nombre:"DIKUT", coordenadas:[40.0025,0.141], latitud:40.0025, longitud:0.141}).bindPopup("VOR:DIKUT"),
+    L.marker([39.5002,-0.0017], {icon: voricon, nombre:"SOPET", coordenadas:[39.5002,-0.0017], latitud:39.5002, longitud:-0.0017}).bindPopup("VOR:SOPET"),
+    L.marker([39.1558,-0.5125], {icon: voricon, nombre:"SERRA", coordenadas:[39.1558,-0.5125], latitud:39.1558, longitud:-0.5125}).bindPopup("VOR:SERRA"),
+    L.marker([39.0128,-1.1547], {icon: voricon, nombre:"ASTRO", coordenadas:[39.0128,-1.1547], latitud:39.0128, longitud:-1.1547}).bindPopup("VOR:ASTRO"),
+    L.marker([38.4309,-1.4608], {icon: voricon, nombre:"POBOS", coordenadas:[38.4309,-1.4608], latitud:38.4309, longitud:-1.4608}).bindPopup("VOR:POBOS"),
+    L.marker([38.3116,-2.0534], {icon: voricon, nombre:"XEBAR", coordenadas:[38.3116,-2.0534], latitud:38.3116, longitud:-2.0534}).bindPopup("VOR:XEBAR"),
+    L.marker([38.2139,-2.2109], {icon: voricon, nombre:"YESTE DVOR/DME (YES)", coordenadas:[38.2139,-2.2109], latitud:38.2139, longitud:-2.2109}).bindPopup("VOR:YESTE DVOR/DME (YES)"),
+    L.marker([37.5717,-2.5342], {icon: voricon, nombre:"MAMIS", coordenadas:[37.5717,-2.5342], latitud:37.5717, longitud:-2.5342}).bindPopup("VOR:MAMIS"),
+    L.marker([37.4404,-3.1107], {icon: voricon, nombre:"BAZAS", coordenadas:[37.4404,-3.1107], latitud:37.4404, longitud:-3.1107}).bindPopup("VOR:BAZAS"),
+    L.marker([37.2332,-3.3751], {icon: voricon, nombre:"VIBAS", coordenadas:[37.2332,-3.3751], latitud:37.2332, longitud:-3.3751}).bindPopup("VOR:VIBAS"),
+    L.marker([42.2201,2.003],   {icon: voricon, nombre:"PUMAL", coordenadas:[42.2201,2.003], latitud:42.2201, longitud:2.003}).bindPopup("VOR:PUMAL"),
+    L.marker([42.1018,2.0155],  {icon: voricon, nombre:"BERGA", coordenadas:[42.1018,2.0155], latitud:42.1018, longitud:2.0155}).bindPopup("VOR:BERGA"),
+    L.marker([41.5012,2.042],   {icon: voricon, nombre:"MAMUK", coordenadas:[41.5012,2.042], latitud:41.5012, longitud:2.042}).bindPopup("VOR:MAMUK"),
+    L.marker([41.3112,2.0635],  {icon: voricon, nombre:"SABADELL DVOR/DME (SLL)", coordenadas:[41.3112,2.0635], latitud:41.3112, longitud:2.0635}).bindPopup("VOR:SABADELL DVOR/DME (SLL)"),
+    L.marker([40.4811,2.1712],  {icon: voricon, nombre:"GARBI", coordenadas:[40.4811,2.1712], latitud:40.4811, longitud:2.1712}).bindPopup("VOR:GARBI"),
+    L.marker([40.3736,2.2055],  {icon: voricon, nombre:"LARPA", coordenadas:[40.3736,2.2055], latitud:40.3736, longitud:2.2055}).bindPopup("VOR:LARPA"),
+    L.marker([40.3,2.2334],     {icon: voricon, nombre:"TOLSO", coordenadas:[40.3,2.2334], latitud:40.3, longitud:2.2334}).bindPopup("VOR:TOLSO"),
+    L.marker([40.1208,2.2947],  {icon: voricon, nombre:"LISAS", coordenadas:[40.1208,2.2947], latitud:40.1208, longitud:2.2947}).bindPopup("VOR:LISAS"),
+    L.marker([39.0129,2.5359],  {icon: voricon, nombre:"OSGAL", coordenadas:[39.0129,2.5359], latitud:39.0129, longitud:2.5359}).bindPopup("VOR:OSGAL"),
+    L.marker([44.0305,-3.0901], {icon: voricon, nombre:"NENEM", coordenadas:[44.0305,-3.0901], latitud:44.0305, longitud:-3.0901}).bindPopup("VOR:NENEM"),
+    L.marker([43.4845,-3.2706], {icon: voricon, nombre:"XORNA", coordenadas:[43.4845,-3.2706], latitud:43.4845, longitud:-3.2706}).bindPopup("VOR:XORNA"),
+    L.marker([43.27,-3.5408],   {icon: voricon, nombre:"SANTANDER DVOR/DME (SNR)", coordenadas:[43.27,-3.5408], latitud:43.27, longitud:-3.5408}).bindPopup("VOR:SANTANDER DVOR/DME (SNR)"),
+    L.marker([42.5728,-3.583],  {icon: voricon, nombre:"TITAN", coordenadas:[42.5728,-3.583], latitud:42.5728, longitud:-3.583}).bindPopup("VOR:TITAN"),
+    L.marker([42.3428,-4.0151], {icon: voricon, nombre:"RATAS", coordenadas:[42.3428,-4.0151], latitud:42.3428, longitud:-4.0151}).bindPopup("VOR:RATAS"),
+    L.marker([42.0139,-4.0633], {icon: voricon, nombre:"TABANERA DEL CERRATO VOR/DME (NEA)", coordenadas:[42.0139,-4.0633], latitud:42.0139, longitud:-4.0633}).bindPopup("VOR:TABANERA DEL CERRATO VOR/DME (NEA)"),
+    L.marker([41.3001,-4.1008], {icon: voricon, nombre:"NONTU", coordenadas:[41.3001,-4.1008], latitud:41.3001, longitud:-4.1008}).bindPopup("VOR:NONTU"),
+    L.marker([41.1557,-4.1143], {icon: voricon, nombre:"ORBIS", coordenadas:[41.1557,-4.1143], latitud:41.1557, longitud:-4.1143}).bindPopup("VOR:ORBIS"),
+    L.marker([41.0055,-4.1324], {icon: voricon, nombre:"DISKO", coordenadas:[41.0055,-4.1324], latitud:41.0055, longitud:-4.1324}).bindPopup("VOR:DISKO"),
+    L.marker([39.4519,-4.2301], {icon: voricon, nombre:"DOPEN", coordenadas:[39.4519,-4.2301], latitud:39.4519, longitud:-4.2301}).bindPopup("VOR:DOPEN"),
+    L.marker([39.1318,-4.2949], {icon: voricon, nombre:"MONTO", coordenadas:[39.1318,-4.2949], latitud:39.1318, longitud:-4.2949}).bindPopup("VOR:MONTO"),
+    L.marker([38.5619,-4.3323], {icon: voricon, nombre:"CRISA", coordenadas:[38.5619,-4.3323], latitud:38.5619, longitud:-4.3323}).bindPopup("VOR:CRISA"),
+    L.marker([37.454,-4.4754],  {icon: voricon, nombre:"VULPE", coordenadas:[37.454,-4.4754], latitud:37.454, longitud:-4.4754}).bindPopup("VOR:VULPE"),
+    L.marker([37.0632,-3.3811], {icon: voricon, nombre:"RIXUR", coordenadas:[37.0632,-3.3811], latitud:37.0632, longitud:-3.3811}).bindPopup("VOR:RIXUR"),
+    L.marker([37.1502,-3.164],  {icon: voricon, nombre:"UNTOS", coordenadas:[37.1502,-3.164], latitud:37.1502, longitud:-3.164}).bindPopup("VOR:UNTOS"),
+    L.marker([37.2456,-2.5116], {icon: voricon, nombre:"ROLAS", coordenadas:[37.2456,-2.5116], latitud:37.2456, longitud:-2.5116}).bindPopup("VOR:ROLAS"),
+    L.marker([37.3732,-2.1826], {icon: voricon, nombre:"TOSGA", coordenadas:[37.3732,-2.1826], latitud:37.3732, longitud:-2.1826}).bindPopup("VOR:TOSGA"),
+    L.marker([37.5427,-1.3327], {icon: voricon, nombre:"RESTU", coordenadas:[37.5427,-1.3327], latitud:37.5427, longitud:-1.3327}).bindPopup("VOR:RESTU"),
+    L.marker([38.2137,-0.1654], {icon: voricon, nombre:"SUMMO", coordenadas:[38.2137,-0.1654], latitud:38.2137, longitud:-0.1654}).bindPopup("VOR:SUMMO"),
+    L.marker([38.2658,-0.0049], {icon: voricon, nombre:"MITOS", coordenadas:[38.2658,-0.0049], latitud:38.2658, longitud:-0.0049}).bindPopup("VOR:MITOS"),
+    L.marker([38.363,0.29],     {icon: voricon, nombre:"BRUNO", coordenadas:[38.363,0.29], latitud:38.363, longitud:0.29}).bindPopup("VOR:BRUNO"),
+    L.marker([38.4008,0.403],   {icon: voricon, nombre:"RUXET", coordenadas:[38.4008,0.403], latitud:38.4008, longitud:0.403}).bindPopup("VOR:RUXET"),
+    L.marker([38.5456,1.2813],  {icon: voricon, nombre:"IBIZA NDB (IZA)", coordenadas:[38.5456,1.2813], latitud:38.5456, longitud:1.2813}).bindPopup("VOR:IBIZA NDB (IZA)"),
+    L.marker([39.1633,2.4256],  {icon: voricon, nombre:"ASMOT", coordenadas:[39.1633,2.4256], latitud:39.1633, longitud:2.4256}).bindPopup("VOR:ASMOT"),
+    L.marker([40.2459,-4.4035], {icon: voricon, nombre:"DIPOL", coordenadas:[40.2459,-4.4035], latitud:40.2459, longitud:-4.4035}).bindPopup("VOR:DIPOL"),
+    L.marker([40.3207,-5.483],  {icon: voricon, nombre:"RIDAV", coordenadas:[40.3207,-5.483], latitud:40.3207, longitud:-5.483}).bindPopup("VOR:RIDAV"),
+    L.marker([40.3501,-6.1809], {icon: voricon, nombre:"BARDI", coordenadas:[40.3501,-6.1809], latitud:40.3501, longitud:-6.1809}).bindPopup("VOR:BARDI"),
+    L.marker([39.1948,-7.1809], {icon: voricon, nombre:"PORTA", coordenadas:[39.1948,-7.1809], latitud:39.1948, longitud:-7.1809}).bindPopup("VOR:PORTA"),
+    L.marker([39.5233,-5.3241], {icon: voricon, nombre:"ROLDO", coordenadas:[39.5233,-5.3241], latitud:39.5233, longitud:-5.3241}).bindPopup("VOR:ROLDO"),
+    L.marker([40.14,-4.364],    {icon: voricon, nombre:"LUPES", coordenadas:[40.14,-4.364], latitud:40.14, longitud:-4.364}).bindPopup("VOR:LUPES"),
+    L.marker([36.3644,-3.52],   {icon: voricon, nombre:"INKAL", coordenadas:[36.3644,-3.52], latitud:36.3644, longitud:-3.52}).bindPopup("VOR:INKAL"),
+    L.marker([36.245,-3.2252],  {icon: voricon, nombre:"LUVIV", coordenadas:[36.245,-3.2252], latitud:36.245, longitud:-3.2252}).bindPopup("VOR:LUVIV"),
+    L.marker([37.034,-1.4422],  {icon: voricon, nombre:"POLCI", coordenadas:[37.034,-1.4422], latitud:37.034, longitud:-1.4422}).bindPopup("VOR:POLCI"),
+    L.marker([37.1523,-1.1716], {icon: voricon, nombre:"DINCO", coordenadas:[37.1523,-1.1716], latitud:37.1523, longitud:-1.1716}).bindPopup("VOR:DINCO"),
+    L.marker([37.1822,-1.1007], {icon: voricon, nombre:"DIMER", coordenadas:[37.1822,-1.1007], latitud:37.1822, longitud:-1.1007}).bindPopup("VOR:DIMER"),
+    L.marker([37.3429,-0.3212], {icon: voricon, nombre:"PALOS", coordenadas:[37.3429,-0.3212], latitud:37.3429, longitud:-0.3212}).bindPopup("VOR:PALOS"),
+    L.marker([38.07,-0.3348], {icon: voricon, nombre:"OSVAN", coordenadas:[38.07,-0.3348], latitud:38.07, longitud:-0.3348}).bindPopup("VOR:OSVAN"),
+    L.marker([41.0906,-3.3617], {icon: voricon, nombre:"SOMOSIERRA DVOR/DME (SIE)", coordenadas:[41.0906,-3.3617], latitud:41.0906, longitud:-3.3617}).bindPopup("VOR:SOMOSIERRA DVOR/DME (SIE)"),
+    L.marker([41.3016,-3.2442], {icon: voricon, nombre:"EDIGO", coordenadas:[41.3016,-3.2442], latitud:41.3016, longitud:-3.2442}).bindPopup("VOR:EDIGO"),
+    L.marker([42.2712,-2.525], {icon: voricon, nombre:"DOMINGO DVOR/DME (DGO)", coordenadas:[42.2712,-2.525], latitud:42.2712, longitud:-2.525}).bindPopup("VOR:DOMINGO DVOR/DME (DGO)"),
+    L.marker([42.5901,-2.1411], {icon: voricon, nombre:"CEGAM", coordenadas:[42.5901,-2.1411], latitud:42.5901, longitud:-2.1411}).bindPopup("VOR:CEGAM"),
+    L.marker([43.0554,-2.0541], {icon: voricon, nombre:"BAGAS", coordenadas:[43.0554,-2.0541], latitud:43.0554, longitud:-2.0541}).bindPopup("VOR:BAGAS"),
+    L.marker([42.2705,2.4956], {icon: voricon, nombre:"ALBER", coordenadas:[42.2705,2.4956], latitud:42.2705, longitud:2.4956}).bindPopup("VOR:ALBER"),
+    L.marker([41.5553,2.4618], {icon: voricon, nombre:"GERONA DVOR/DME (GIR)", coordenadas:[41.5553,2.4618], latitud:41.5553, longitud:2.4618}).bindPopup("VOR:GERONA DVOR/DME (GIR)"),
+    L.marker([25.0,-15.4712], {icon: voricon, nombre:"ROTUM", coordenadas:[25.0,-15.4712], latitud:25.0, longitud:-15.4712}).bindPopup("VOR:ROTUM"),
+    L.marker([25.4238,-18.3546], {icon: voricon, nombre:"AGUMO", coordenadas:[25.4238,-18.3546], latitud:25.4238, longitud:-18.3546}).bindPopup("VOR:AGUMO"),
+    L.marker([26.5341,-17.0224], {icon: voricon, nombre:"URQUI", coordenadas:[26.5341,-17.0224], latitud:26.5341, longitud:-17.0224}).bindPopup("VOR:URQUI"),
+    L.marker([29.0956,-13.304], {icon: voricon, nombre:"LANZAROTE DVOR/DME (LZR)", coordenadas:[29.0956,-13.304], latitud:29.0956, longitud:-13.304}).bindPopup("VOR:LANZAROTE DVOR/DME (LZR)"),
+    L.marker([29.4353,-12.3442], {icon: voricon, nombre:"KORAL", coordenadas:[29.4353,-12.3442], latitud:29.4353, longitud:-12.3442}).bindPopup("VOR:KORAL"),
+    L.marker([35.5,-6.1421], {icon: voricon, nombre:"KORIS", coordenadas:[35.5,-6.1421], latitud:35.5, longitud:-6.1421}).bindPopup("VOR:KORIS"),
+    L.marker([35.5601,-6.1028], {icon: voricon, nombre:"XULIM", coordenadas:[35.5601,-6.1028], latitud:35.5601, longitud:-6.1028}).bindPopup("VOR:XULIM"),
+    L.marker([36.1421,-5.5831], {icon: voricon, nombre:"VEJER DE LA FRONTERA DVOR/DME (VJF)", coordenadas:[36.1421,-5.5831], latitud:36.1421, longitud:-5.5831}).bindPopup("VOR:VEJER DE LA FRONTERA DVOR/DME (VJF)"),
+    L.marker([39.0,-3.1317], {icon: voricon, nombre:"ANZAN", coordenadas:[39.0,-3.1317], latitud:39.0, longitud:-3.1317}).bindPopup("VOR:ANZAN"),
+    L.marker([39.2357,-3.014], {icon: voricon, nombre:"NASOS", coordenadas:[39.2357,-3.014], latitud:39.2357, longitud:-3.014}).bindPopup("VOR:NASOS"),
+    L.marker([39.3524,-2.5602], {icon: voricon, nombre:"INTAX", coordenadas:[39.3524,-2.5602], latitud:39.3524, longitud:-2.5602}).bindPopup("VOR:INTAX"),
+    L.marker([42.0511,3.3733], {icon: voricon, nombre:"BISBA", coordenadas:[42.0511,3.3733], latitud:42.0511, longitud:3.3733}).bindPopup("VOR:BISBA"),
+    L.marker([41.0327,4.4], {icon: voricon, nombre:"MUREN", coordenadas:[41.0327,4.4], latitud:41.0327, longitud:4.4}).bindPopup("VOR:MUREN"),
+    L.marker([41.1104,3.2629], {icon: voricon, nombre:"SULID", coordenadas:[41.1104,3.2629], latitud:41.1104, longitud:3.2629}).bindPopup("VOR:SULID"),
+    L.marker([41.29,1.3949], {icon: voricon, nombre:"CAVES", coordenadas:[41.29,1.3949], latitud:41.29, longitud:1.3949}).bindPopup("VOR:CAVES"),
+    L.marker([41.3249,1.3007], {icon: voricon, nombre:"VIBOK", coordenadas:[41.3249,1.3007], latitud:41.3249, longitud:1.3007}).bindPopup("VOR:VIBOK"),
+    L.marker([41.5042,0.4349], {icon: voricon, nombre:"GEMAS", coordenadas:[41.5042,0.4349], latitud:41.5042, longitud:0.4349}).bindPopup("VOR:GEMAS"),
+    L.marker([41.5559,0.2955], {icon: voricon, nombre:"ALOSU", coordenadas:[41.5559,0.2955], latitud:41.5559, longitud:0.2955}).bindPopup("VOR:ALOSU"),
+    L.marker([42.0341,0.0926], {icon: voricon, nombre:"POSSY", coordenadas:[42.0341,0.0926], latitud:42.0341, longitud:0.0926}).bindPopup("VOR:POSSY"),
+    L.marker([42.1237,-0.1439], {icon: voricon, nombre:"MARIO", coordenadas:[42.1237,-0.1439], latitud:42.1237, longitud:-0.1439}).bindPopup("VOR:MARIO"),
+    L.marker([42.1944,-0.3405], {icon: voricon, nombre:"SURCO", coordenadas:[42.1944,-0.3405], latitud:42.1944, longitud:-0.3405}).bindPopup("VOR:SURCO"),
+    L.marker([42.2154,-0.4002], {icon: voricon, nombre:"XOMBO", coordenadas:[42.2154,-0.4002], latitud:42.2154, longitud:-0.4002}).bindPopup("VOR:XOMBO"),
+    L.marker([42.2545,-0.5041], {icon: voricon, nombre:"RONNY", coordenadas:[42.2545,-0.5041], latitud:42.2545, longitud:-0.5041}).bindPopup("VOR:RONNY"),
+    L.marker([42.2945,-1.015], {icon: voricon, nombre:"RONKO", coordenadas:[42.2945,-1.015], latitud:42.2945, longitud:-1.015}).bindPopup("VOR:RONKO"),
+    L.marker([42.37,-1.221], {icon: voricon, nombre:"GOSVI", coordenadas:[42.37,-1.221], latitud:42.37, longitud:-1.221}).bindPopup("VOR:GOSVI"),
+    L.marker([42.404,-1.3233], {icon: voricon, nombre:"TURPU", coordenadas:[42.404,-1.3233], latitud:42.404, longitud:-1.3233}).bindPopup("VOR:TURPU"),
+    L.marker([42.4402,-1.4207], {icon: voricon, nombre:"PAMPLONA DVOR/DME (PPN)", coordenadas:[42.4402,-1.4207], latitud:42.4402, longitud:-1.4207}).bindPopup("VOR:PAMPLONA DVOR/DME (PPN)"),
+    L.marker([42.5042,-1.5619], {icon: voricon, nombre:"MALOB", coordenadas:[42.5042,-1.5619], latitud:42.5042, longitud:-1.5619}).bindPopup("VOR:MALOB"),
+    L.marker([43.1816,-2.5609], {icon: voricon, nombre:"BILBAO DVOR/DME (BLV)", coordenadas:[43.1816,-2.5609], latitud:43.1816, longitud:-2.5609}).bindPopup("VOR:BILBAO DVOR/DME (BLV)"),
+    L.marker([43.405,-3.19], {icon: voricon, nombre:"DOSUL", coordenadas:[43.405,-3.19], latitud:43.405, longitud:-3.19}).bindPopup("VOR:DOSUL"),
+    L.marker([41.362,3.5137], {icon: voricon, nombre:"MAROT", coordenadas:[41.362,3.5137], latitud:41.362, longitud:3.5137}).bindPopup("VOR:MAROT"),
+    L.marker([39.2103,-0.0028], {icon: voricon, nombre:"COMPI", coordenadas:[39.2103,-0.0028], latitud:39.2103, longitud:-0.0028}).bindPopup("VOR:COMPI"),
+    L.marker([39.1232,0.29], {icon: voricon, nombre:"NINOT", coordenadas:[39.1232,0.29], latitud:39.1232, longitud:0.29}).bindPopup("VOR:NINOT"),
+    L.marker([39.0759,0.443], {icon: voricon, nombre:"XOSTA", coordenadas:[39.0759,0.443], latitud:39.0759, longitud:0.443}).bindPopup("VOR:XOSTA"),
+    L.marker([38.4924,1.3234], {icon: voricon, nombre:"RONDU", coordenadas:[38.4924,1.3234], latitud:38.4924, longitud:1.3234}).bindPopup("VOR:RONDU"),
+    L.marker([38.3313,1.4511], {icon: voricon, nombre:"INSUB", coordenadas:[38.3313,1.4511], latitud:38.3313, longitud:1.4511}).bindPopup("VOR:INSUB"),
+    L.marker([42.1202,-6.5641], {icon: voricon, nombre:"BARKO", coordenadas:[42.1202,-6.5641], latitud:42.1202, longitud:-6.5641}).bindPopup("VOR:BARKO"),
+    L.marker([42.4748,-6.3219], {icon: voricon, nombre:"BISMU", coordenadas:[42.4748,-6.3219], latitud:42.4748, longitud:-6.3219}).bindPopup("VOR:BISMU"),
+    L.marker([43.064,-6.1901], {icon: voricon, nombre:"KUVAN", coordenadas:[43.064,-6.1901], latitud:43.064, longitud:-6.1901}).bindPopup("VOR:KUVAN"),
+    L.marker([43.3325,-6.0026], {icon: voricon, nombre:"ASTURIAS DVOR/DME (VES)", coordenadas:[43.3325,-6.0026], latitud:43.3325, longitud:-6.0026}).bindPopup("VOR:ASTURIAS DVOR/DME (VES)"),
+    L.marker([43.5641,-5.3418], {icon: voricon, nombre:"DEVAR", coordenadas:[43.5641,-5.3418], latitud:43.5641, longitud:-5.3418}).bindPopup("VOR:DEVAR"),
+    L.marker([40.3722,-6.4322], {icon: voricon, nombre:"RIVRO", coordenadas:[40.3722,-6.4322], latitud:40.3722, longitud:-6.4322}).bindPopup("VOR:RIVRO"),
+    L.marker([40.5927,-6.1719], {icon: voricon, nombre:"TOSDI", coordenadas:[40.5927,-6.1719], latitud:40.5927, longitud:-6.1719}).bindPopup("VOR:TOSDI"),
+    L.marker([42.2737,-2.1937], {icon: voricon, nombre:"LOGROÑO DVOR/DME (LPA)", coordenadas:[42.2737,-2.1937], latitud:42.2737, longitud:-2.1937}).bindPopup("VOR:LOGROÑO DVOR/DME (LPA)"),
+    L.marker([42.3534,-2.0133], {icon: voricon, nombre:"VEGEL", coordenadas:[42.3534,-2.0133], latitud:42.3534, longitud:-2.0133}).bindPopup("VOR:VEGEL"),
+    L.marker([39.5209,-2.2944], {icon: voricon, nombre:"ULSES", coordenadas:[39.5209,-2.2944], latitud:39.5209, longitud:-2.2944}).bindPopup("VOR:ULSES"),
+    L.marker([39.0,-2.2446], {icon: voricon, nombre:"ANANA", coordenadas:[39.0,-2.2446], latitud:39.0, longitud:-2.2446}).bindPopup("VOR:ANANA"),
+    L.marker([37.1759,-2.1724], {icon: voricon, nombre:"RISPO", coordenadas:[37.1759,-2.1724], latitud:37.1759, longitud:-2.1724}).bindPopup("VOR:RISPO"),
+    L.marker([42.511,-7.1746], {icon: voricon, nombre:"LOMDA", coordenadas:[42.511,-7.1746], latitud:42.511, longitud:-7.1746}).bindPopup("VOR:LOMDA"),
+    L.marker([42.4602,-6.0952], {icon: voricon, nombre:"LARVO", coordenadas:[42.4602,-6.0952], latitud:42.4602, longitud:-6.0952}).bindPopup("VOR:LARVO"),
+    L.marker([42.4431,-5.5123], {icon: voricon, nombre:"ROVAK", coordenadas:[42.4431,-5.5123], latitud:42.4431, longitud:-5.5123}).bindPopup("VOR:ROVAK"),
+    L.marker([42.4223,-5.2634], {icon: voricon, nombre:"SUSOS", coordenadas:[42.4223,-5.2634], latitud:42.4223, longitud:-5.2634}).bindPopup("VOR:SUSOS"),
+    L.marker([42.3958,-4.592], {icon: voricon, nombre:"NUBLO", coordenadas:[42.3958,-4.592], latitud:42.3958, longitud:-4.592}).bindPopup("VOR:NUBLO"),
+    L.marker([42.3912,-4.5059], {icon: voricon, nombre:"NEDUS", coordenadas:[42.3912,-4.5059], latitud:42.3912, longitud:-4.5059}).bindPopup("VOR:NEDUS"),
+    L.marker([41.512,-7.3617], {icon: voricon, nombre:"MALIS", coordenadas:[41.512,-7.3617], latitud:41.512, longitud:-7.3617}).bindPopup("VOR:MALIS"),
+    L.marker([39.0409,-0.4619], {icon: voricon, nombre:"BEGOX", coordenadas:[39.0409,-0.4619], latitud:39.0409, longitud:-0.4619}).bindPopup("VOR:BEGOX"),
+    L.marker([38.4418,-0.5955], {icon: voricon, nombre:"NARGO", coordenadas:[38.4418,-0.5955], latitud:38.4418, longitud:-0.5955}).bindPopup("VOR:NARGO"),
+    L.marker([37.1443,-1.5906], {icon: voricon, nombre:"DOSEK", coordenadas:[37.1443,-1.5906], latitud:37.1443, longitud:-1.5906}).bindPopup("VOR:DOSEK"),
+    L.marker([36.281,-2.3725], {icon: voricon, nombre:"VADAT", coordenadas:[36.281,-2.3725], latitud:36.281, longitud:-2.3725}).bindPopup("VOR:VADAT"),
+    L.marker([31.2425,-16.3325], {icon: voricon, nombre:"ORTIS", coordenadas:[31.2425,-16.3325], latitud:31.2425, longitud:-16.3325}).bindPopup("VOR:ORTIS"),
+    L.marker([30.211,-16.2657], {icon: voricon, nombre:"PITAB", coordenadas:[30.211,-16.2657], latitud:30.211, longitud:-16.2657}).bindPopup("VOR:PITAB"),
+    L.marker([29.3529,-16.2222], {icon: voricon, nombre:"BRICK", coordenadas:[29.3529,-16.2222], latitud:29.3529, longitud:-16.2222}).bindPopup("VOR:BRICK"),
+    L.marker([28.3213,-16.1607], {icon: voricon, nombre:"TENERIFE NORTE DVOR/DME (TFN)", coordenadas:[28.3213,-16.1607], latitud:28.3213, longitud:-16.1607}).bindPopup("VOR:TENERIFE NORTE DVOR/DME (TFN)"),
+    L.marker([27.0525,-15.1611], {icon: voricon, nombre:"REMGI", coordenadas:[27.0525,-15.1611], latitud:27.0525, longitud:-15.1611}).bindPopup("VOR:REMGI"),
+    L.marker([26.082,-14.3838], {icon: voricon, nombre:"CABOJ", coordenadas:[26.082,-14.3838], latitud:26.082, longitud:-14.3838}).bindPopup("VOR:CABOJ"),
+    L.marker([42.252,-7.2319], {icon: voricon, nombre:"FINAM", coordenadas:[42.252,-7.2319], latitud:42.252, longitud:-7.2319}).bindPopup("VOR:FINAM"),
+    L.marker([42.0617,-7.4514], {icon: voricon, nombre:"BEDAL", coordenadas:[42.0617,-7.4514], latitud:42.0617, longitud:-7.4514}).bindPopup("VOR:BEDAL"),
+    L.marker([35.5,-6.0142], {icon: voricon, nombre:"ADKIM", coordenadas:[35.5,-6.0142], latitud:35.5, longitud:-6.0142}).bindPopup("VOR:ADKIM"),
+    L.marker([41.2915,0.304], {icon: voricon, nombre:"OSVAK", coordenadas:[41.2915,0.304], latitud:41.2915, longitud:0.304}).bindPopup("VOR:OSVAK"),
+    L.marker([41.3311,0.3853], {icon: voricon, nombre:"LÉRIDA NDB (LRD)", coordenadas:[41.3311,0.3853], latitud:41.3311, longitud:0.3853}).bindPopup("VOR:LÉRIDA NDB (LRD)"),
+    L.marker([41.4618,1.3706], {icon: voricon, nombre:"LATRO", coordenadas:[41.4618,1.3706], latitud:41.4618, longitud:1.3706}).bindPopup("VOR:LATRO"),
+    L.marker([40.1359,-2.2438], {icon: voricon, nombre:"VILLA", coordenadas:[40.1359,-2.2438], latitud:40.1359, longitud:-2.2438}).bindPopup("VOR:VILLA"),
+    L.marker([39.592,-2.1028], {icon: voricon, nombre:"NANDO", coordenadas:[39.592,-2.1028], latitud:39.592, longitud:-2.1028}).bindPopup("VOR:NANDO"),
+    L.marker([42.1016,-2.044], {icon: voricon, nombre:"GARVU", coordenadas:[42.1016,-2.044], latitud:42.1016, longitud:-2.044}).bindPopup("VOR:GARVU"),
+    L.marker([42.4355,-2.5156], {icon: voricon, nombre:"VITORIA VOR/DME (VRA)", coordenadas:[42.4355,-2.5156], latitud:42.4355, longitud:-2.5156}).bindPopup("VOR:VITORIA VOR/DME (VRA)"),
+    L.marker([43.0557,-3.2328], {icon: voricon, nombre:"ROLES", coordenadas:[43.0557,-3.2328], latitud:43.0557, longitud:-3.2328}).bindPopup("VOR:ROLES"),
+    L.marker([39.0,-4.5049], {icon: voricon, nombre:"RUSEM", coordenadas:[39.0,-4.5049], latitud:39.0, longitud:-4.5049}).bindPopup("VOR:RUSEM"),
+    L.marker([39.1137,-4.4447], {icon: voricon, nombre:"SOTUK", coordenadas:[39.1137,-4.4447], latitud:39.1137, longitud:-4.4447}).bindPopup("VOR:SOTUK"),
+    L.marker([39.4737,-4.2552], {icon: voricon, nombre:"USOKO", coordenadas:[39.4737,-4.2552], latitud:39.4737, longitud:-4.2552}).bindPopup("VOR:USOKO"),
+    L.marker([37.3447,-3.0127], {icon: voricon, nombre:"ARPEX", coordenadas:[37.3447,-3.0127], latitud:37.3447, longitud:-3.0127}).bindPopup("VOR:ARPEX"),
+    L.marker([37.1145,-2.3737], {icon: voricon, nombre:"AGIDO", coordenadas:[37.1145,-2.3737], latitud:37.1145, longitud:-2.3737}).bindPopup("VOR:AGIDO"),
+    L.marker([41.5612,-7.0659], {icon: voricon, nombre:"RALUS", coordenadas:[41.5612,-7.0659], latitud:41.5612, longitud:-7.0659}).bindPopup("VOR:RALUS"),
+    L.marker([41.4712,-6.3339], {icon: voricon, nombre:"MOSEN", coordenadas:[41.4712,-6.3339], latitud:41.4712, longitud:-6.3339}).bindPopup("VOR:MOSEN"),
+    L.marker([41.4317,-6.1925], {icon: voricon, nombre:"GODIV", coordenadas:[41.4317,-6.1925], latitud:41.4317, longitud:-6.1925}).bindPopup("VOR:GODIV"),
+    L.marker([40.2236,0.3118], {icon: voricon, nombre:"NAVAR", coordenadas:[40.2236,0.3118], latitud:40.2236, longitud:0.3118}).bindPopup("VOR:NAVAR"),
+    L.marker([41.3016,-3.16], {icon: voricon, nombre:"BASIM", coordenadas:[41.3016,-3.16], latitud:41.3016, longitud:-3.16}).bindPopup("VOR:BASIM"),
+    L.marker([41.4346,-3.0256], {icon: voricon, nombre:"GASMO", coordenadas:[41.4346,-3.0256], latitud:41.4346, longitud:-3.0256}).bindPopup("VOR:GASMO"),
+    L.marker([42.1016,-2.3655], {icon: voricon, nombre:"VABAR", coordenadas:[42.1016,-2.3655], latitud:42.1016, longitud:-2.3655}).bindPopup("VOR:VABAR"),
+    L.marker([42.3752,-2.0919], {icon: voricon, nombre:"MIRPO", coordenadas:[42.3752,-2.0919], latitud:42.3752, longitud:-2.0919}).bindPopup("VOR:MIRPO"),
+    L.marker([42.5404,-1.5253], {icon: voricon, nombre:"PODUX", coordenadas:[42.5404,-1.5253], latitud:42.5404, longitud:-1.5253}).bindPopup("VOR:PODUX"),
+    L.marker([42.3659,-7.4701], {icon: voricon, nombre:"ELTEP", coordenadas:[42.3659,-7.4701], latitud:42.3659, longitud:-7.4701}).bindPopup("VOR:ELTEP"),
+    L.marker([42.2805,-7.2853], {icon: voricon, nombre:"FORNO", coordenadas:[42.2805,-7.2853], latitud:42.2805, longitud:-7.2853}).bindPopup("VOR:FORNO"),
+    L.marker([42.1632,-7.0539], {icon: voricon, nombre:"INSID", coordenadas:[42.1632,-7.0539], latitud:42.1632, longitud:-7.0539}).bindPopup("VOR:INSID"),
+    L.marker([41.4949,-6.13], {icon: voricon, nombre:"DESAT", coordenadas:[41.4949,-6.13], latitud:41.4949, longitud:-6.13}).bindPopup("VOR:DESAT"),
+    L.marker([25.0,-17.3732], {icon: voricon, nombre:"LIMAL", coordenadas:[25.0,-17.3732], latitud:25.0, longitud:-17.3732}).bindPopup("VOR:LIMAL"),
+    L.marker([43.4102,-3.0239], {icon: voricon, nombre:"MAPAX", coordenadas:[43.4102,-3.0239], latitud:43.4102, longitud:-3.0239}).bindPopup("VOR:MAPAX"),
+    L.marker([41.3016,-3.06], {icon: voricon, nombre:"OSTIX", coordenadas:[41.3016,-3.06], latitud:41.3016, longitud:-3.06}).bindPopup("VOR:OSTIX"),
+    L.marker([41.5526,3.5601], {icon: voricon, nombre:"PIVUS", coordenadas:[41.5526,3.5601], latitud:41.5526, longitud:3.5601}).bindPopup("VOR:PIVUS"),
+    L.marker([43.41,-2.485], {icon: voricon, nombre:"BISKA", coordenadas:[43.41,-2.485], latitud:43.41, longitud:-2.485}).bindPopup("VOR:BISKA"),
+    L.marker([43.4411,-2.4748], {icon: voricon, nombre:"BADRU", coordenadas:[43.4411,-2.4748], latitud:43.4411, longitud:-2.4748}).bindPopup("VOR:BADRU"),
+    L.marker([43.41,-2.4415], {icon: voricon, nombre:"BAPOR", coordenadas:[43.41,-2.4415], latitud:43.41, longitud:-2.4415}).bindPopup("VOR:BAPOR"),
+    L.marker([39.5658,-4.364], {icon: voricon, nombre:"RUKER", coordenadas:[39.5658,-4.364], latitud:39.5658, longitud:-4.364}).bindPopup("VOR:RUKER"),
+    L.marker([40.5216,-0.4734], {icon: voricon, nombre:"NEXAS", coordenadas:[40.5216,-0.4734], latitud:40.5216, longitud:-0.4734}).bindPopup("VOR:NEXAS"),
+    L.marker([40.5202,-1.1753], {icon: voricon, nombre:"CALAMOCHA VOR/DME (CMA)", coordenadas:[40.5202,-1.1753], latitud:40.5202, longitud:-1.1753}).bindPopup("VOR:CALAMOCHA VOR/DME (CMA)"),
+    L.marker([39.4651,-3.2751], {icon: voricon, nombre:"VILLATOBAS DVOR/DME (VTB)", coordenadas:[39.4651,-3.2751], latitud:39.4651, longitud:-3.2751}).bindPopup("VOR:VILLATOBAS DVOR/DME (VTB)"),
+    L.marker([39.3428,-3.2905], {icon: voricon, nombre:"BEXID", coordenadas:[39.3428,-3.2905], latitud:39.3428, longitud:-3.2905}).bindPopup("VOR:BEXID"),
+    L.marker([39.0,-3.3232], {icon: voricon, nombre:"MORAL", coordenadas:[39.0,-3.3232], latitud:39.0, longitud:-3.3232}).bindPopup("VOR:MORAL"),
+    L.marker([37.3907,-3.3744], {icon: voricon, nombre:"TINEK", coordenadas:[37.3907,-3.3744], latitud:37.3907, longitud:-3.3744}).bindPopup("VOR:TINEK"),
+    L.marker([37.0305,-2.4627], {icon: voricon, nombre:"ESILA", coordenadas:[37.0305,-2.4627], latitud:37.0305, longitud:-2.4627}).bindPopup("VOR:ESILA"),
+    L.marker([39.3437,-3.2401], {icon: voricon, nombre:"IDEVU", coordenadas:[39.3437,-3.2401], latitud:39.3437, longitud:-3.2401}).bindPopup("VOR:IDEVU"),
+    L.marker([41.5533,-9.2143], {icon: voricon, nombre:"DEMOS", coordenadas:[41.5533,-9.2143], latitud:41.5533, longitud:-9.2143}).bindPopup("VOR:DEMOS"),
+    L.marker([43.3911,-7.5156], {icon: voricon, nombre:"KORAV", coordenadas:[43.3911,-7.5156], latitud:43.3911, longitud:-7.5156}).bindPopup("VOR:KORAV"),
+    L.marker([43.2118,-1.4425], {icon: voricon, nombre:"URUNA", coordenadas:[43.2118,-1.4425], latitud:43.2118, longitud:-1.4425}).bindPopup("VOR:URUNA"),
+    L.marker([43.1841,-1.495], {icon: voricon, nombre:"SAN SEBASTIÁN DVOR/DME (SSN)", coordenadas:[43.1841,-1.495], latitud:43.1841, longitud:-1.495}).bindPopup("VOR:SAN SEBASTIÁN DVOR/DME (SSN)"),
+    L.marker([43.0056,-1.4552], {icon: voricon, nombre:"DITOP", coordenadas:[43.0056,-1.4552], latitud:43.0056, longitud:-1.4552}).bindPopup("VOR:DITOP"),
+    L.marker([42.2539,-1.5427], {icon: voricon, nombre:"NOLSA", coordenadas:[42.2539,-1.5427], latitud:42.2539, longitud:-1.5427}).bindPopup("VOR:NOLSA"),
+    L.marker([42.2037,-1.5748], {icon: voricon, nombre:"ALEPO", coordenadas:[42.2037,-1.5748], latitud:42.2037, longitud:-1.5748}).bindPopup("VOR:ALEPO"),
+    L.marker([42.1619,-2.004], {icon: voricon, nombre:"VASUM", coordenadas:[42.1619,-2.004], latitud:42.1619, longitud:-2.004}).bindPopup("VOR:VASUM"),
+    L.marker([41.3009,-2.3052], {icon: voricon, nombre:"BANEV", coordenadas:[41.3009,-2.3052], latitud:41.3009, longitud:-2.3052}).bindPopup("VOR:BANEV"),
+    L.marker([41.1925,-2.3748], {icon: voricon, nombre:"BARAHONA DVOR/DME (BAN)", coordenadas:[41.1925,-2.3748], latitud:41.1925, longitud:-2.3748}).bindPopup("VOR:BARAHONA DVOR/DME (BAN)"),
+    L.marker([40.5849,-2.3557], {icon: voricon, nombre:"PINAR", coordenadas:[40.5849,-2.3557], latitud:40.5849, longitud:-2.3557}).bindPopup("VOR:PINAR"),
+    L.marker([39.3358,-3.4446], {icon: voricon, nombre:"INPAN", coordenadas:[39.3358,-3.4446], latitud:39.3358, longitud:-3.4446}).bindPopup("VOR:INPAN"),
+    L.marker([36.4239,-3.4834], {icon: voricon, nombre:"ULPEP", coordenadas:[36.4239,-3.4834], latitud:36.4239, longitud:-3.4834}).bindPopup("VOR:ULPEP"),
+    L.marker([36.3827,-3.2618], {icon: voricon, nombre:"OBAKA", coordenadas:[36.3827,-3.2618], latitud:36.3827, longitud:-3.2618}).bindPopup("VOR:OBAKA"),
+    L.marker([36.2845,-2.3632], {icon: voricon, nombre:"BOLKA", coordenadas:[36.2845,-2.3632], latitud:36.2845, longitud:-2.3632}).bindPopup("VOR:BOLKA"),
+    L.marker([39.5442,-1.0226], {icon: voricon, nombre:"MANDY", coordenadas:[39.5442,-1.0226], latitud:39.5442, longitud:-1.0226}).bindPopup("VOR:MANDY"),
+    L.marker([39.2637,-0.5432], {icon: voricon, nombre:"RETBA", coordenadas:[39.2637,-0.5432], latitud:39.2637, longitud:-0.5432}).bindPopup("VOR:RETBA"),
+    L.marker([39.2401,-0.5346], {icon: voricon, nombre:"SOBRO", coordenadas:[39.2401,-0.5346], latitud:39.2401, longitud:-0.5346}).bindPopup("VOR:SOBRO"),
+    L.marker([43.2146,-3.19], {icon: voricon, nombre:"CALCE", coordenadas:[43.2146,-3.19], latitud:43.2146, longitud:-3.19}).bindPopup("VOR:CALCE"),
+    L.marker([43.2835,-4.2], {icon: voricon, nombre:"OBETO", coordenadas:[43.2835,-4.2], latitud:43.2835, longitud:-4.2}).bindPopup("VOR:OBETO"),
+    L.marker([43.2904,-4.3013], {icon: voricon, nombre:"RONSI", coordenadas:[43.2904,-4.3013], latitud:43.2904, longitud:-4.3013}).bindPopup("VOR:RONSI"),
+    L.marker([43.3015,-4.5224], {icon: voricon, nombre:"LASKU", coordenadas:[43.3015,-4.5224], latitud:43.3015, longitud:-4.5224}).bindPopup("VOR:LASKU"),
+    L.marker([43.3144,-5.1915], {icon: voricon, nombre:"AMAKA", coordenadas:[43.3144,-5.1915], latitud:43.3144, longitud:-5.1915}).bindPopup("VOR:AMAKA"),
+    L.marker([43.2332,-6.392], {icon: voricon, nombre:"MASIP", coordenadas:[43.2332,-6.392], latitud:43.2332, longitud:-6.392}).bindPopup("VOR:MASIP"),
+    L.marker([43.1247,-7.2127], {icon: voricon, nombre:"ROXER", coordenadas:[43.1247,-7.2127], latitud:43.1247, longitud:-7.2127}).bindPopup("VOR:ROXER"),
+    L.marker([37.0744,-7.23], {icon: voricon, nombre:"MINTA", coordenadas:[37.0744,-7.23], latitud:37.0744, longitud:-7.23}).bindPopup("VOR:MINTA"),
+    L.marker([37.0956,-7.1131], {icon: voricon, nombre:"OSLEP", coordenadas:[37.0956,-7.1131], latitud:37.0956, longitud:-7.1131}).bindPopup("VOR:OSLEP"),
+    L.marker([37.1146,-7.0149], {icon: voricon, nombre:"NAPES", coordenadas:[37.1146,-7.0149], latitud:37.1146, longitud:-7.0149}).bindPopup("VOR:NAPES"),
+    L.marker([37.1448,-6.4536], {icon: voricon, nombre:"ONUBA", coordenadas:[37.1448,-6.4536], latitud:37.1448, longitud:-6.4536}).bindPopup("VOR:ONUBA"),
+    L.marker([37.1729,-6.3106], {icon: voricon, nombre:"PIMUR", coordenadas:[37.1729,-6.3106], latitud:37.1729, longitud:-6.3106}).bindPopup("VOR:PIMUR"),
+    L.marker([37.362,-5.1506], {icon: voricon, nombre:"AMOTA", coordenadas:[37.362,-5.1506], latitud:37.362, longitud:-5.1506}).bindPopup("VOR:AMOTA"),
+    L.marker([37.5207,-4.2851], {icon: voricon, nombre:"KUKAL", coordenadas:[37.5207,-4.2851], latitud:37.5207, longitud:-4.2851}).bindPopup("VOR:KUKAL"),
+    L.marker([39.2422,2.2503], {icon: voricon, nombre:"EDULI", coordenadas:[39.2422,2.2503], latitud:39.2422, longitud:2.2503}).bindPopup("VOR:EDULI"),
+    L.marker([38.5747,0.5636], {icon: voricon, nombre:"IBEBA", coordenadas:[38.5747,0.5636], latitud:38.5747, longitud:0.5636}).bindPopup("VOR:IBEBA"),
+    L.marker([38.5247,0.403], {icon: voricon, nombre:"BAVER", coordenadas:[38.5247,0.403], latitud:38.5247, longitud:0.403}).bindPopup("VOR:BAVER"),
+    L.marker([38.4911,0.29], {icon: voricon, nombre:"GERVU", coordenadas:[38.4911,0.29], latitud:38.4911, longitud:0.29}).bindPopup("VOR:GERVU"),
+    L.marker([40.5208,0.442], {icon: voricon, nombre:"SENIA", coordenadas:[40.5208,0.442], latitud:40.5208, longitud:0.442}).bindPopup("VOR:SENIA"),
+    L.marker([40.4813,0.3821], {icon: voricon, nombre:"AMPOL", coordenadas:[40.4813,0.3821], latitud:40.4813, longitud:0.3821}).bindPopup("VOR:AMPOL"),
+    L.marker([40.3324,0.1556], {icon: voricon, nombre:"MATEX", coordenadas:[40.3324,0.1556], latitud:40.3324, longitud:0.1556}).bindPopup("VOR:MATEX"),
+    L.marker([43.0,-3.1316], {icon: voricon, nombre:"AMTOS", coordenadas:[43.0,-3.1316], latitud:43.0, longitud:-3.1316}).bindPopup("VOR:AMTOS"),
+    L.marker([41.0118,0.2633], {icon: voricon, nombre:"PELAT", coordenadas:[41.0118,0.2633], latitud:41.0118, longitud:0.2633}).bindPopup("VOR:PELAT"),
+    L.marker([44.0316,-5.5605], {icon: voricon, nombre:"MAVOS", coordenadas:[44.0316,-5.5605], latitud:44.0316, longitud:-5.5605}).bindPopup("VOR:MAVOS"),
+    L.marker([43.0343,-5.5444], {icon: voricon, nombre:"XONDA", coordenadas:[43.0343,-5.5444], latitud:43.0343, longitud:-5.5444}).bindPopup("VOR:XONDA"),
+    L.marker([42.5147,-5.5243], {icon: voricon, nombre:"GOTOX", coordenadas:[42.5147,-5.5243], latitud:42.5147, longitud:-5.5243}).bindPopup("VOR:GOTOX"),
+    L.marker([42.1635,-5.462], {icon: voricon, nombre:"OMESI", coordenadas:[42.1635,-5.462], latitud:42.1635, longitud:-5.462}).bindPopup("VOR:OMESI"),
+    L.marker([41.5743,-5.4257], {icon: voricon, nombre:"VETAN", coordenadas:[41.5743,-5.4257], latitud:41.5743, longitud:-5.4257}).bindPopup("VOR:VETAN"),
+    L.marker([42.4404,-2.1135], {icon: voricon, nombre:"KUDEX", coordenadas:[42.4404,-2.1135], latitud:42.4404, longitud:-2.1135}).bindPopup("VOR:KUDEX"),
+    L.marker([42.5942,-1.3], {icon: voricon, nombre:"GOMSO", coordenadas:[42.5942,-1.3], latitud:42.5942, longitud:-1.3}).bindPopup("VOR:GOMSO"),
+    L.marker([43.033,-1.2703], {icon: voricon, nombre:"BEGUY", coordenadas:[43.033,-1.2703], latitud:43.033, longitud:-1.2703}).bindPopup("VOR:BEGUY"),
+    L.marker([41.3013,-3.3649], {icon: voricon, nombre:"XERMA", coordenadas:[41.3013,-3.3649], latitud:41.3013, longitud:-3.3649}).bindPopup("VOR:XERMA"),
+    L.marker([42.0118,-3.3649], {icon: voricon, nombre:"ARLUN", coordenadas:[42.0118,-3.3649], latitud:42.0118, longitud:-3.3649}).bindPopup("VOR:ARLUN"),
+    L.marker([42.2129,-3.3807], {icon: voricon, nombre:"BUGIX", coordenadas:[42.2129,-3.3807], latitud:42.2129, longitud:-3.3807}).bindPopup("VOR:BUGIX"),
+    L.marker([42.4056,-3.4159], {icon: voricon, nombre:"UNGAS", coordenadas:[42.4056,-3.4159], latitud:42.4056, longitud:-3.4159}).bindPopup("VOR:UNGAS"),
+    L.marker([42.5728,-3.4651], {icon: voricon, nombre:"EMANU", coordenadas:[42.5728,-3.4651], latitud:42.5728, longitud:-3.4651}).bindPopup("VOR:EMANU"),
+    L.marker([43.46,-3.5558], {icon: voricon, nombre:"VADOX", coordenadas:[43.46,-3.5558], latitud:43.46, longitud:-3.5558}).bindPopup("VOR:VADOX"),
+    L.marker([40.5114,-3.1447], {icon: voricon, nombre:"ROBLEDILLO DVOR/DME (RBO)", coordenadas:[40.5114,-3.1447], latitud:40.5114, longitud:-3.1447}).bindPopup("VOR:ROBLEDILLO DVOR/DME (RBO)"),
+    L.marker([41.0122,-2.2235], {icon: voricon, nombre:"SEGRE", coordenadas:[41.0122,-2.2235], latitud:41.0122, longitud:-2.2235}).bindPopup("VOR:SEGRE"),
+    L.marker([41.0445,-2.0441], {icon: voricon, nombre:"BRITO", coordenadas:[41.0445,-2.0441], latitud:41.0445, longitud:-2.0441}).bindPopup("VOR:BRITO"),
+    L.marker([41.2114,-0.3251], {icon: voricon, nombre:"PONEN", coordenadas:[41.2114,-0.3251], latitud:41.2114, longitud:-0.3251}).bindPopup("VOR:PONEN"),
+    L.marker([36.0136,-7.23], {icon: voricon, nombre:"ORTOP", coordenadas:[36.0136,-7.23], latitud:36.0136, longitud:-7.23}).bindPopup("VOR:ORTOP"),
+    L.marker([35.552,-6.4159], {icon: voricon, nombre:"TUTIS", coordenadas:[35.552,-6.4159], latitud:35.552, longitud:-6.4159}).bindPopup("VOR:TUTIS"),
+    L.marker([35.5538,-6.2853], {icon: voricon, nombre:"TAVSI", coordenadas:[35.5538,-6.2853], latitud:35.5538, longitud:-6.2853}).bindPopup("VOR:TAVSI"),
+    L.marker([35.5556,-6.1422], {icon: voricon, nombre:"PISIG", coordenadas:[35.5556,-6.1422], latitud:35.5556, longitud:-6.1422}).bindPopup("VOR:PISIG"),
+    L.marker([35.5615,-5.5723], {icon: voricon, nombre:"AMPIR", coordenadas:[35.5615,-5.5723], latitud:35.5615, longitud:-5.5723}).bindPopup("VOR:AMPIR"),
+    L.marker([35.5736,-5.4638], {icon: voricon, nombre:"SOVIS", coordenadas:[35.5736,-5.4638], latitud:35.5736, longitud:-5.4638}).bindPopup("VOR:SOVIS"),
+    L.marker([36.0513,-4.4332], {icon: voricon, nombre:"GOSOS", coordenadas:[36.0513,-4.4332], latitud:36.0513, longitud:-4.4332}).bindPopup("VOR:GOSOS"),
+    L.marker([36.1217,-2.5237], {icon: voricon, nombre:"GONZA", coordenadas:[36.1217,-2.5237], latitud:36.1217, longitud:-2.5237}).bindPopup("VOR:GONZA"),
+    L.marker([36.2204,-2.0317], {icon: voricon, nombre:"GOLFO", coordenadas:[36.2204,-2.0317], latitud:36.2204, longitud:-2.0317}).bindPopup("VOR:GOLFO"),
+    L.marker([36.36,-1.13], {icon: voricon, nombre:"MIMDI", coordenadas:[36.36,-1.13], latitud:36.36, longitud:-1.13}).bindPopup("VOR:MIMDI"),
+    L.marker([38.1,2.3], {icon: voricon, nombre:"PIMAD", coordenadas:[38.1,2.3], latitud:38.1, longitud:2.3}).bindPopup("VOR:PIMAD"),
+    L.marker([38.2418,2.5114], {icon: voricon, nombre:"XARON", coordenadas:[38.2418,2.5114], latitud:38.2418, longitud:2.5114}).bindPopup("VOR:XARON"),
+    L.marker([41.1238,1.4221], {icon: voricon, nombre:"VILLANUEVA NDB (VNV)", coordenadas:[41.1238,1.4221], latitud:41.1238, longitud:1.4221}).bindPopup("VOR:VILLANUEVA NDB (VNV)"),
+    L.marker([40.4134,1.5529], {icon: voricon, nombre:"NEPAL", coordenadas:[40.4134,1.5529], latitud:40.4134, longitud:1.5529}).bindPopup("VOR:NEPAL"),
+    L.marker([40.1659,2.0544], {icon: voricon, nombre:"ESPOR", coordenadas:[40.1659,2.0544], latitud:40.1659, longitud:2.0544}).bindPopup("VOR:ESPOR"),
+    L.marker([42.3318,-3.1512], {icon: voricon, nombre:"AMGAR", coordenadas:[42.3318,-3.1512], latitud:42.3318, longitud:-3.1512}).bindPopup("VOR:AMGAR"),
+    L.marker([27.2136,-13.4208], {icon: voricon, nombre:"COSTI", coordenadas:[27.2136,-13.4208], latitud:27.2136, longitud:-13.4208}).bindPopup("VOR:COSTI"),
+    L.marker([37.4647,-0.4846], {icon: voricon, nombre:"SAN JAVIER VORTAC (VSJ)", coordenadas:[37.4647,-0.4846], latitud:37.4647, longitud:-0.4846}).bindPopup("VOR:SAN JAVIER VORTAC (VSJ)"),
+    L.marker([37.1403,-1.3917], {icon: voricon, nombre:"BANSO", coordenadas:[37.1403,-1.3917], latitud:37.1403, longitud:-1.3917}).bindPopup("VOR:BANSO"),
+    L.marker([37.0923,-1.4623], {icon: voricon, nombre:"ALZUP", coordenadas:[37.0923,-1.4623], latitud:37.0923, longitud:-1.4623}).bindPopup("VOR:ALZUP"),
+    L.marker([39.1625,-1.2944], {icon: voricon, nombre:"SOSAV", coordenadas:[39.1625,-1.2944], latitud:39.1625, longitud:-1.2944}).bindPopup("VOR:SOSAV"),
+    L.marker([39.2445,-0.5016], {icon: voricon, nombre:"MOPIR", coordenadas:[39.2445,-0.5016], latitud:39.2445, longitud:-0.5016}).bindPopup("VOR:MOPIR"),
+    L.marker([42.0424,-0.1908], {icon: voricon, nombre:"HUESCA DVOR/DME (HUE)", coordenadas:[42.0424,-0.1908], latitud:42.0424, longitud:-0.1908}).bindPopup("VOR:HUESCA DVOR/DME (HUE)"),
+    L.marker([42.1041,-0.2936], {icon: voricon, nombre:"VETAR", coordenadas:[42.1041,-0.2936], latitud:42.1041, longitud:-0.2936}).bindPopup("VOR:VETAR"),
+    L.marker([40.4992,-3.5674], {icon: voricon, nombre:"MADRID", coordenadas:[40.499246, -3.567437], latitud:40.4992, longitud:-3.5674}).bindPopup("VOR:MADRID"),
+    L.marker([41.3021,2.0855], {icon: voricon, nombre:"BARCELONA", coordenadas:[41.302121, 2.085580], latitud:41.3021, longitud:2.0855}).bindPopup("VOR:BARCELONA"),
+    L.marker([43.3028,-2.9079], {icon: voricon, nombre:"BILBAO", coordenadas:[43.302818, -2.907962], latitud:43.3028, longitud:-2.9079}).bindPopup("VOR:BILBAO"),
+    L.marker([37.4191,-5.8839], {icon: voricon, nombre:"SEVILLA", coordenadas:[37.419179, -5.888392], latitud:37.4191, longitud:-5.8839}).bindPopup("VOR:SEVILLA"),
+    L.marker([43.4253,-3.8164], {icon: voricon, nombre:"SANTANDER", coordenadas:[43.425371, -3.816417], latitud:43.4253, longitud:-3.8164}).bindPopup("VOR:SANTANDER"),
+    L.marker([43.5629,-6.0365], {icon: voricon, nombre:"ASTURIAS", coordenadas:[43.562997, -6.036579], latitud:43.5629, longitud:-6.0365}).bindPopup("VOR:ASTURIAS"),
+    L.marker([42.8983,-8.4177], {icon: voricon, nombre:"SANTIAGO", coordenadas:[42.898328, -8.417732], latitud:42.8983, longitud:-8.4177}).bindPopup("VOR:SANTIAGO"),
+    L.marker([43.3007,-8.3797], {icon: voricon, nombre:"ACORUNA", coordenadas:[43.300783, -8.379770], latitud:43.3007, longitud:-8.3797}).bindPopup("VOR:ACORUNA"),
+    L.marker([42.2303,-8.6277], {icon: voricon, nombre:"VIGO", coordenadas:[42.230373, -8.627758], latitud:42.2303, longitud:-8.6277}).bindPopup("VOR:VIGO"),
+    L.marker([41.7055,-4.8599], {icon: voricon, nombre:"VALLADOLID", coordenadas:[41.705582, -4.845992], latitud:41.7055, longitud:-4.8599}).bindPopup("VOR:VALLADOLID"),
+    L.marker([40.9437,-5.5047], {icon: voricon, nombre:"SALAMANCA", coordenadas:[40.943715, -5.504752], latitud:40.9437, longitud:-5.5047}).bindPopup("VOR:SALAMANCA"),
+    L.marker([41.6595,-1.0432], {icon: voricon, nombre:"ZARAGOZA", coordenadas:[41.659543, -1.043260], latitud:41.6595, longitud:-1.0432}).bindPopup("VOR:ZARAGOZA"),
+    L.marker([41.9027,2.7617], {icon: voricon, nombre:"GIRONA", coordenadas:[41.902714, 2.761757], latitud:41.9027, longitud:2.7617}).bindPopup("VOR:GIRONA"),
+    L.marker([39.7885,-0.478], {icon: voricon, nombre:"VALENCIA", coordenadas:[39.488504, -0.478069], latitud:39.7885, longitud:-0.478}).bindPopup("VOR:VALENCIA"),
+    L.marker([38.9455,-1.8774], {icon: voricon, nombre:"ALBACETE", coordenadas:[38.945562, -1.877423], latitud:38.9455, longitud:-1.8774}).bindPopup("VOR:ALBACETE"),
+    L.marker([38.2851,-0.5613], {icon: voricon, nombre:"ALICANTE", coordenadas:[38.285138, -0.561343], latitud:38.2851, longitud:-0.5613}).bindPopup("VOR:ALICANTE"),
+    L.marker([37.8032,-1.1332], {icon: voricon, nombre:"MURCIA", coordenadas:[37.803265, -1.133187], latitud:37.8032, longitud:-1.1332}).bindPopup("VOR:MURCIA"),
+    L.marker([36.8439,-2.3724], {icon: voricon, nombre:"ALMERIA", coordenadas:[36.843988, -2.372428], latitud:36.8439, longitud:-2.3724}).bindPopup("VOR:ALMERIA"),
+    L.marker([37.1873,-3.7793], {icon: voricon, nombre:"GRANADA", coordenadas:[37.187309, -3.779395], latitud:37.1873, longitud:-3.7793}).bindPopup("VOR:GRANADA"),
+    L.marker([36.6766,-4.4957], {icon: voricon, nombre:"MALAGA", coordenadas:[36.676691, -4.495726], latitud:36.6766, longitud:-4.4957}).bindPopup("VOR:MALAGA"),
+    L.marker([36.7887,-6.0613], {icon: voricon, nombre:"JEREZ", coordenadas:[36.744743, -6.061393], latitud:36.7887, longitud:-6.0613}).bindPopup("VOR:JEREZ"),
+    L.marker([39.5513,2.7356], {icon: voricon, nombre:"MALLORCA", coordenadas:[39.551368, 2.735650], latitud:39.5513, longitud:2.7356}).bindPopup("VOR:MALLORCA"),
+    L.marker([38.8745,1.3703], {icon: voricon, nombre:"IBIZA", coordenadas:[38.874542, 1.370365], latitud:38.8745, longitud:1.3703}).bindPopup("VOR:IBIZA"),
+    L.marker([39.8626,4.22], {icon: voricon, nombre:"MENORCA", coordenadas:[39.862625, 4.220085], latitud:39.8626, longitud:4.22}).bindPopup("VOR:MENORCA"),
+    L.marker([42.0405,-8.3348], {icon: voricon, nombre:"TURON", coordenadas:[42.0405,-8.3348], latitud:42.0405, longitud:-8.3348}).bindPopup("VOR:TURON"),
+    L.marker([37.1629,1.0726], {icon: voricon, nombre:"LABRO", coordenadas:[37.1629,1.0726], latitud:37.1629, longitud:1.0726}).bindPopup("VOR:LABRO"),
+    L.marker([40.4651,2.5338], {icon: voricon, nombre:"OSTUR", coordenadas:[40.4651,2.5338], latitud:40.4651, longitud:2.5338}).bindPopup("VOR:OSTUR"),
+    L.marker([38.0647,3.0905], {icon: voricon, nombre:"BUYAH", coordenadas:[38.0647,3.0905], latitud:38.0647, longitud:3.0905}).bindPopup("VOR:BUYAH"),
+    L.marker([39.5724,4.4], {icon: voricon, nombre:"MORSS", coordenadas:[39.5724,4.4], latitud:39.5724, longitud:4.4}).bindPopup("VOR:MORSS"),
+    L.marker([36.5216,-0.0125], {icon: voricon, nombre:"HAMRA", coordenadas:[36.5216,-0.0125], latitud:36.5216, longitud:-0.0125}).bindPopup("VOR:HAMRA"),
+    L.marker([36.2418,-1.0816], {icon: voricon, nombre:"TARIK", coordenadas:[36.2418,-1.0816], latitud:36.2418, longitud:-1.0816}).bindPopup("VOR:TARIK"),
+    L.marker([35.5,-3.2627], {icon: voricon, nombre:"PEKOP", coordenadas:[35.5,-3.2627], latitud:35.5, longitud:-3.2627}).bindPopup("VOR:PEKOP"),
+    L.marker([21.51,-16.4], {icon: voricon, nombre:"LOLOS", coordenadas:[21.51,-16.4], latitud:21.51, longitud:-16.4}).bindPopup("VOR:LOLOS"),
+    L.marker([35.5,-5.0837], {icon: voricon, nombre:"GALTO", coordenadas:[35.5,-5.0837], latitud:35.5, longitud:-5.0837}).bindPopup("VOR:GALTO"),
+    L.marker([38.2849,3.5659], {icon: voricon, nombre:"PECES", coordenadas:[38.2849,3.5659], latitud:38.2849, longitud:3.5659}).bindPopup("VOR:PECES"),
+    L.marker([36.0015,-5.1435], {icon: voricon, nombre:"XAVIR", coordenadas:[36.0015,-5.1435], latitud:36.0015, longitud:-5.1435}).bindPopup("VOR:XAVIR"),
+    L.marker([38.0755,3.1207], {icon: voricon, nombre:"MOGIL", coordenadas:[38.0755,3.1207], latitud:38.0755, longitud:3.1207}).bindPopup("VOR:MOGIL"),
+    L.marker([39.2538,3.1524], {icon: voricon, nombre:"PORTO COLOM NDB (PTC)", coordenadas:[39.2538,3.1524], latitud:39.2538, longitud:3.1524}).bindPopup("VOR:PORTO COLOM NDB (PTC)"),
+    L.marker([42.1233,4.0001], {icon: voricon, nombre:"MAMES", coordenadas:[42.1233,4.0001], latitud:42.1233, longitud:4.0001}).bindPopup("VOR:MAMES"),
+    L.marker([44.1944,-3.5915], {icon: voricon, nombre:"DELOG", coordenadas:[44.1944,-3.5915], latitud:44.1944, longitud:-3.5915}).bindPopup("VOR:DELOG"),
+    L.marker([37.4813,2.1944], {icon: voricon, nombre:"SADAF", coordenadas:[37.4813,2.1944], latitud:37.4813, longitud:2.1944}).bindPopup("VOR:SADAF"),
+    L.marker([44.3019,-4.5651], {icon: voricon, nombre:"ATLEN", coordenadas:[44.3019,-4.5651], latitud:44.3019, longitud:-4.5651}).bindPopup("VOR:ATLEN"),
+    L.marker([35.5,-3.1409], {icon: voricon, nombre:"BERUM", coordenadas:[35.5,-3.1409], latitud:35.5, longitud:-3.1409}).bindPopup("VOR:BERUM"),
+    L.marker([41.4854,-8.0452], {icon: voricon, nombre:"ASPOR", coordenadas:[41.4854,-8.0452], latitud:41.4854, longitud:-8.0452}).bindPopup("VOR:ASPOR"),
+    L.marker([42.0447,4.2454], {icon: voricon, nombre:"DIBER", coordenadas:[42.0447,4.2454], latitud:42.0447, longitud:4.2454}).bindPopup("VOR:DIBER"),
+    L.marker([39.322,-1.4443], {icon: voricon, nombre:"MOTIL", coordenadas:[39.322,-1.4443], latitud:39.322, longitud:-1.4443}).bindPopup("VOR:MOTIL"),
+    L.marker([35.5,-2.4111], {icon: voricon, nombre:"ESAMI", coordenadas:[35.5,-2.4111], latitud:35.5, longitud:-2.4111}).bindPopup("VOR:ESAMI"),
+    L.marker([40.1855,0.2108], {icon: voricon, nombre:"ASDIR", coordenadas:[40.1855,0.2108], latitud:40.1855, longitud:0.2108}).bindPopup("VOR:ASDIR"),
+    L.marker([28.0009,-16.4115], {icon: voricon, nombre:"TENERIFE SUR DVOR/DME (TFS)", coordenadas:[28.0009,-16.4115], latitud:28.0009, longitud:-16.4115}).bindPopup("VOR:TENERIFE SUR DVOR/DME (TFS)"),
+    L.marker([43.5451,-2.4419], {icon: voricon, nombre:"BELEN", coordenadas:[43.5451,-2.4419], latitud:43.5451, longitud:-2.4419}).bindPopup("VOR:BELEN"),
+    L.marker([40.433,-2.0816], {icon: voricon, nombre:"TERSA", coordenadas:[40.433,-2.0816], latitud:40.433, longitud:-2.0816}).bindPopup("VOR:TERSA"),
+    L.marker([44.5007,-6.5511], {icon: voricon, nombre:"KORUL", coordenadas:[44.5007,-6.5511], latitud:44.5007, longitud:-6.5511}).bindPopup("VOR:KORUL"),
+    L.marker([35.5,-5.5716], {icon: voricon, nombre:"LINTO", coordenadas:[35.5,-5.5716], latitud:35.5, longitud:-5.5716}).bindPopup("VOR:LINTO"),
+    L.marker([42.0823,-8.1342], {icon: voricon, nombre:"NARBO", coordenadas:[42.0823,-8.1342], latitud:42.0823, longitud:-8.1342}).bindPopup("VOR:NARBO"),
+    L.marker([43.1702,-1.2929], {icon: voricon, nombre:"DONOS", coordenadas:[43.1702,-1.2929], latitud:43.1702, longitud:-1.2929}).bindPopup("VOR:DONOS"),
+    L.marker([41.203,0.3357], {icon: voricon, nombre:"VILAR", coordenadas:[41.203,0.3357], latitud:41.203, longitud:0.3357}).bindPopup("VOR:VILAR"),
+    L.marker([39.3506,4.4], {icon: voricon, nombre:"SOTAX", coordenadas:[39.3506,4.4], latitud:39.3506, longitud:4.4}).bindPopup("VOR:SOTAX")
+    ]
+
+    var vorpoints = L.layerGroup(points); 
+
+    //LISTADO RUTAS
+    var routes = L.layerGroup();
+
+
+
+    //CONTROL DE ZOOM Y ETIQUETAS DEL MAPA
+
+    var map = L.map('mapid', {
+    center: [40.47099, -3.755],
+    maxZoom: 8,
+    minZoom: 6,
+    maxBounds: [
+        //south west
+        [32, -22],
+        //north east
+        [48, 15]
+        ],
+    layers: [gray, airports, routes]
+    }).setView([40.47099, -3.755], 6);
+
+
+    var overlays = {
+    "<span style='color: #9da0a3'>Show Airports</span>": airports,
+    "<span style='color: #9da0a3'>Show VOR Points</span>": vorpoints,
+    "<span style='color: #9da0a3'>Show Routes</span>": routes
+    };
+
+
+    L.control.layers(null, overlays).addTo(map);
+
+    </script>
+    
+    <!-- Funcion para pintar la ruta cuando se inicie el mapa -->
+    <script>
+
+        var orig = "{{ orig }}";
+        var dest = "{{ dest }}" ;
+
+        let way = JSON.parse('{{ way | tojson }}');
+        let dist = JSON.parse('{{ dist | tojson }}');
+        var numVOR = way.length;
+
+        document.getElementById("numeroVOR").value= numVOR;
+        document.getElementById("distancia").value= Math.round(dist/1000);
+
+        let vectorflask1 = way.unshift(orig);
+        let vectorflask = way.push(dest);
+        var sizevec = way.length ;
+
+        var coordorig = [];
+        var coorddest = [];
+
+        aeropuertos.forEach(item => {
+            if(item.options.nombre == orig){
+            console.log(item.options.nombre);
+            coordorig =  item.options.coordenadas;
+            // alert(item.options.coordenadas);
+            }
+            if(item.options.nombre == dest){
+            console.log(item.options.nombre);
+            coorddest =  item.options.coordenadas;
+            // alert(item.options.coordenadas);
+            }
+        })
+
+        var coordendasvor = [];
+        for (var i = 0; i <= sizevec; i++) {    
+            points.forEach(item => {
+            if(item.options.nombre == way[i]){
+                console.log(way[i]);
+                coordendasvor[i] =  item.options.coordenadas;
+            }
+            })
+        } 
+
+        for (var i = 1; i <= sizevec; i++) {    
+            var pruebed=coordendasvor[i];
+            var rutaelegida  = L.polygon([coordendasvor[i], coordendasvor[i-1]]).addTo(map).addTo(routes);
+        } 
+        
+
+    </script>
+{% endblock %}
