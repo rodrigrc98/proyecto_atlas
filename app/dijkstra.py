@@ -18,7 +18,8 @@ class Graph(object):
         self.distances[(from_node, to_node)] = distance
 
 
-#algoritmo para encontrar camino mas corto
+
+# algoritmo para encontrar camino mas corto
 
 def dijkstra(graph, initial):
     visited = {initial: 0}
@@ -51,6 +52,7 @@ def dijkstra(graph, initial):
 
     return visited, path
 
+#devuelve una lista con los puntos vor visitados y el aeropuerto de salida y destino
 
 def shortest_path(graph, origin, destination):
     visited, paths = dijkstra(graph, origin)
@@ -62,11 +64,10 @@ def shortest_path(graph, origin, destination):
         _destination = paths[_destination]
 
     route = list(full_path)
-    distance = visited[destination]
 
-    shortest_path.distance = distance
-    shortest_path.route = route
     return route
+
+#igual que shortest_path pero devuelve la distancia recorrida
 
 def dist_path(graph, origin, destination):
     visited, paths = dijkstra(graph, origin)
@@ -77,11 +78,8 @@ def dist_path(graph, origin, destination):
         full_path.appendleft(_destination)
         _destination = paths[_destination]
 
-    route = list(full_path)
     distance = visited[destination]
-
-    dist_path.distance = distance
-    dist_path.route = route
+ 
     return distance
 
 
@@ -90,17 +88,13 @@ if __name__ == '__main__':
 
     i = 0
 
-    for node in vor_name_ini:
+    for node in vor_name_ini:           #generamos los nodos (vor)
         
         graph.add_node(vor_name_ini[i])
         i += 1
     
     i = 0
-    for edge in route_name:
+    for edge in route_name:             #generamos los caminos que existen entre nodos (no se puede ir de cualquier nodo a cualquier nodo)
+        
         graph.add_edge(vor_name_ini[i], vor_name_end[i], distance_list[i])
         i += 1
-
-    shortest_path(graph, 'ACORUNA' , 'VALENCIA')
-
-    print(shortest_path.route)
-    # print(shortest_path.distance)
