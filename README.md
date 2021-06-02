@@ -19,5 +19,5 @@ Para iniciar el servidor debemos tener activado el env, despues introduciremos l
 * $ flask run
 
 Una vez hecho esto nos aparecera el puerto donde esta la app, y bastara con copiarlo en la barra del navegador
-web que tengamos predeterminado.
+web que tengamos predeterminado. Con esto ya se puede utilizar de forma completa.
 
