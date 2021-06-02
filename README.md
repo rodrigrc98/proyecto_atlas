@@ -4,9 +4,9 @@ Para correr la app seguir los siguientes pasos (descrito para Windows).
 # Creacion del env en python
 Se recomienda la creacion de un env de python en la carpeta donde se vaya a guardar el codigo. Para ello
 realizar los siguientes pasos en la terminal:
-1. Escogemos la carpeta -->  $ cd micarpeta
-2. Ahora creamos el env --> $ py -3 -m venv venv
-3. Para activarlo introducimos --> $ venv\Scripts\activate
+1. Escogemos la carpeta -->  *$ cd micarpeta*
+2. Ahora creamos el env --> *$ py -3 -m venv venv*
+3. Para activarlo introducimos --> *$ venv\Scripts\activate*
 
 # Instalacion de los paquetes
 Con el env activado, instalaremos los paquetes con los siguiente comandos:
