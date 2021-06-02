@@ -11,7 +11,22 @@ realizar los siguientes pasos en la terminal:
 # Instalacion de los paquetes
 Con el env activado, instalaremos los paquetes con los siguiente comandos:
 
+*$ pip install python-math*
+
+*$ pip install xlrd*
+
+*$ pip install numpy*
+
+*$ pip install pandas*
+
+*$ pip install bokeh*
+
+*$ pip install requests*
+
 *$ pip install Flask*
+
+*$ pip install jupyter*
+
 
 # Iniciar el servidor en Jupyter y el trackeador
 Para iniciar el servidor debemos tener activado el env, despues introduciremos el siguiente comando:
