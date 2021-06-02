@@ -17,8 +17,6 @@ class Graph(object):
         self.edges[to_node].append(from_node)
         self.distances[(from_node, to_node)] = distance
 
-
-
 # algoritmo para encontrar camino mas corto
 
 def dijkstra(graph, initial):
