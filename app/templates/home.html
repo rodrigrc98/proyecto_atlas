@@ -42,12 +42,12 @@
                 <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
                     <form>
                         <div class="form-row">
-                        <a class="btn btn-block btn-lg btn-primary" href="http://localhost:8000/" target="_blank" style="width: 150%;">Ver mapa</a>
+                            <a class="btn btn-block btn-lg btn-primary" href="http://localhost:8000/" target="_blank" style="width: 150%;">Ver mapa</a>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
+        </div> 
     </section>
     
     <!-- Icons Grid-->
@@ -113,6 +113,9 @@
         </div>
     </section>
 
+
+
+
     <!-- Miembros-->
     <section class="testimonials text-center bg-light">
         <div class="container">
@@ -150,14 +153,14 @@
                     <div class="testimonial-item mx-auto mb-5 mb-lg-0">
                         <img class="img-fluid rounded-circle mb-3" src="static/assets/img/usuarioDesconocido.png" alt="..." />
                         <h5>Rodrigo Garces</h5>
-                        <p class="font-weight-light mb-0">Equipo JavaScript</p>
+                        <p class="font-weight-light mb-0">Equipo Python</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Call to Action-->
+    <!-- Imagen -->
     <section class="call-to-action text-white text-center">
         <div class="overlay"></div>
         <div class="container">
@@ -168,10 +171,19 @@
 
 <!-- Footer personalizado -->
 {% block footer %}
-<ul class="list-inline mb-2">
-    <li class="list-inline-item"><a href="/objetivos">Objetivos del Proyecto</a></li>
-</ul>
-<p class="text-muted small mb-4 mb-lg-0">© Project Atlas 2021. All Rights Reserved.</p>
+    <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+        <ul class="list-inline mb-2">
+            <li class="list-inline-item"><a href="/objetivos">Objetivos del Proyecto</a></li>
+        </ul>
+        <p class="text-muted small mb-4 mb-lg-0">© Project Atlas 2021. All Rights Reserved.</p>            
+    </div>
+    <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
+        <ul class="list-inline mb-0">
+            <li class="list-inline-item mr-3">
+                <a href="https://github.com/rodrigrc98/proyecto_atlas" target="_blank"><i class="fab fa-github fa-4x fa-fw"></i></a>
+            </li>
+        </ul>
+    </div>
 {% endblock %}
 
 <!-- PARTE JS personalizado -->
