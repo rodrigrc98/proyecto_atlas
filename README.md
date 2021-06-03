@@ -28,7 +28,7 @@ Con el env activado, instalaremos los paquetes con los siguiente comandos:
 
 
 # Iniciar el servidor en Jupyter y el trackeador
-Para iniciar el servidor debemos tener activado el env, despues introduciremos el siguiente comando:
+Para iniciar el servidor debemos tener activado el venv, despues introduciremos el siguiente comando:
 
 *$ jupyter notebook*
 
@@ -41,7 +41,7 @@ el servidor en Jupyter:
 Con esto ya esta activado para su uso en el *localhost:8000*. Para apagar el servidor basta con pulsar *ctrl + c*.
 
 # Iniciar el servidor en FLASK y uso de la app
-Para iniciar el servidor debemos tener activado el env, despues introduciremos los siguientes comandos (debemos correr 
+Para iniciar el servidor debemos tener activado el venv, despues introduciremos los siguientes comandos (debemos correr 
 esto en otra terminal ya que en la otra tendremos el servidor de Jupyter activo):
 
 *$ set FLASK_APP=app.py*
